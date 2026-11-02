@@ -1,4 +1,4 @@
-package dev.oasm.phapthuat;
+package phapthuat;
 
 import net.neoforged.neoforge.common.ModConfigSpec;
 

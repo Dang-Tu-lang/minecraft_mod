@@ -1,4 +1,4 @@
-package dev.oasm.phapthuat;
+package phapthuat;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

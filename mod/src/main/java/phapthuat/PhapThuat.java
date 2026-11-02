@@ -1,4 +1,4 @@
-package dev.oasm.phapthuat;
+package phapthuat;
 
 import org.slf4j.Logger;
 

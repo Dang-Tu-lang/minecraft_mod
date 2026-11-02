@@ -4,7 +4,7 @@
 
 **Goal:** Thêm 7 phép nền tảng còn lại (Xung Lực, Hồ Quang, Từ Trường, Phát Quang, Đốt Nhiên Liệu, Bức Xạ Neutron, Nâng) lên nền móng của kế hoạch 1, đủ 9 phép cho cả 7 nguyên tố.
 
-**Architecture:** Giống kế hoạch 1. Mỗi phép có một lớp tính toán Java thuần trong `dev.oasm.phapthuat.physics` (JUnit với ví dụ số của spec) và một lớp `Spell` trong `dev.oasm.phapthuat.spell.impl` (GameTest cho hiệu ứng trong thế giới). Đốt Nhiên Liệu và Hồ Quang dùng lại `HeatSpell.applyHeat`.
+**Architecture:** Giống kế hoạch 1. Mỗi phép có một lớp tính toán Java thuần trong `phapthuat.physics` (JUnit với ví dụ số của spec) và một lớp `Spell` trong `phapthuat.spell.impl` (GameTest cho hiệu ứng trong thế giới). Đốt Nhiên Liệu và Hồ Quang dùng lại `HeatSpell.applyHeat`.
 
 **Tech Stack:** Java 21, NeoForge 21.1.265, Minecraft 1.21.1, JUnit 5, GameTest.
 
