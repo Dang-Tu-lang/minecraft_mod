@@ -8,6 +8,10 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
+import net.neoforged.neoforge.common.NeoForge;
+import phapthuat.mana.ManaAttachments;
+import phapthuat.mana.ManaManager;
+import phapthuat.network.ModNetwork;
 
 @Mod(PhapThuat.MODID)
 public class PhapThuat {
@@ -16,5 +20,10 @@ public class PhapThuat {
 
     public PhapThuat(IEventBus modBus, ModContainer container) {
         container.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
+
+        ManaAttachments.ATTACHMENT_TYPES.register(modBus);
+        modBus.addListener(ModNetwork::register);
+
+        NeoForge.EVENT_BUS.register(ManaManager.class);
     }
 }
