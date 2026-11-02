@@ -10,6 +10,9 @@ import net.neoforged.neoforge.client.gui.ConfigurationScreen;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
 import phapthuat.client.ManaHudLayer;
+import phapthuat.registry.ModEntities;
+import net.minecraft.client.renderer.entity.NoopRenderer;
+import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 
 // Lớp này không được nạp trên server riêng, nên dùng code client ở đây là an toàn.
 @Mod(value = PhapThuat.MODID, dist = Dist.CLIENT)
@@ -17,6 +20,12 @@ public class PhapThuatClient {
     public PhapThuatClient(IEventBus modBus, ModContainer container) {
         container.registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
         modBus.addListener(PhapThuatClient::registerGuiLayers);
+        modBus.addListener(PhapThuatClient::registerRenderers);
+    }
+
+    private static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
+        // Đạn phép chỉ hiện bằng hạt lửa, không có mô hình.
+        event.registerEntityRenderer(ModEntities.SPELL_PROJECTILE.get(), NoopRenderer::new);
     }
 
     private static void registerGuiLayers(RegisterGuiLayersEvent event) {

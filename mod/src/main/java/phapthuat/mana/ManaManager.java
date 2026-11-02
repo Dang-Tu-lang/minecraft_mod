@@ -51,6 +51,8 @@ public final class ManaManager {
     }
 
     public static void sync(ServerPlayer player, boolean force) {
+        // Người chơi giả của GameTest không có kênh mạng của mod.
+        if (player.connection == null || !player.connection.hasChannel(ManaSyncPayload.TYPE)) return;
         long shown = Math.round(get(player) * 10);
         Long last = LAST_SENT.get(player.getUUID());
         if (!force && last != null && last == shown) return;

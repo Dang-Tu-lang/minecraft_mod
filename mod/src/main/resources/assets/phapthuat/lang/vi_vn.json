@@ -24,6 +24,31 @@
   "phapthuat.configuration.airBurstKnockbackPerKpa": "Hất văng mỗi kPa áp suất dư",
   "phapthuat.configuration.maxTrackedBlocks": "Số khối lưu nhiệt tối đa",
 
+  "entity.phapthuat.spell_projectile": "Đạn phép",
+
+  "phapthuat.shape.diem": "Điểm",
+  "phapthuat.shape.tia": "Tia",
+  "phapthuat.shape.duong": "Đường",
+  "phapthuat.shape.cau": "Cầu",
+  "phapthuat.shape.tuong": "Tường",
+  "phapthuat.shape.dan": "Đạn",
+  "phapthuat.shape.ban_than": "Bản thân",
+
+  "phapthuat.param.length": "Độ dài",
+  "phapthuat.param.radius": "Bán kính",
+  "phapthuat.param.width": "Rộng",
+  "phapthuat.param.height": "Cao",
+  "phapthuat.param.speed": "Tốc độ phóng",
+
+  "phapthuat.unit.m": "m",
+  "phapthuat.unit.blocks": "khối",
+  "phapthuat.unit.m_per_s": "m/s",
+  "phapthuat.unit.mana": "mana",
+
+  "phapthuat.cast.unknown": "Phép này không tồn tại",
+  "phapthuat.cast.no_mana": "Không đủ mana",
+  "phapthuat.cast.launched": "%s: đạn phép đã bay với %s m/s",
+
   "phapthuat.yes": "có",
   "phapthuat.no": "không",
 
