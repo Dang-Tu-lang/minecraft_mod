@@ -15,6 +15,8 @@ import phapthuat.network.ModNetwork;
 import phapthuat.registry.ModCreativeTab;
 import phapthuat.registry.ModDataComponents;
 import phapthuat.registry.ModItems;
+import phapthuat.thermal.ThermalAttachments;
+import phapthuat.thermal.ThermalTicker;
 
 @Mod(PhapThuat.MODID)
 public class PhapThuat {
@@ -28,8 +30,10 @@ public class PhapThuat {
         ModDataComponents.COMPONENTS.register(modBus);
         ModCreativeTab.TABS.register(modBus);
         ManaAttachments.ATTACHMENT_TYPES.register(modBus);
+        ThermalAttachments.ATTACHMENT_TYPES.register(modBus);
         modBus.addListener(ModNetwork::register);
 
         NeoForge.EVENT_BUS.register(ManaManager.class);
+        NeoForge.EVENT_BUS.register(ThermalTicker.class);
     }
 }
