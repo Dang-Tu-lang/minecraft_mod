@@ -5,4 +5,8 @@ rem         g runClient  -> mo Minecraft co san mod de choi thu
 rem         g --stop     -> tat tien trinh Gradle chay ngam (lam truoc khi xoa thu muc)
 set "JAVA_HOME=%~dp0..\tools\jdk-21"
 set "GRADLE_USER_HOME=%~dp0..\tools\gradle-home"
+pushd "%~dp0"
 call "%~dp0gradlew.bat" %*
+set "G_EXIT=%ERRORLEVEL%"
+popd
+exit /b %G_EXIT%
