@@ -12,6 +12,9 @@ import net.neoforged.neoforge.common.NeoForge;
 import phapthuat.mana.ManaAttachments;
 import phapthuat.mana.ManaManager;
 import phapthuat.network.ModNetwork;
+import phapthuat.registry.ModCreativeTab;
+import phapthuat.registry.ModDataComponents;
+import phapthuat.registry.ModItems;
 
 @Mod(PhapThuat.MODID)
 public class PhapThuat {
@@ -21,6 +24,9 @@ public class PhapThuat {
     public PhapThuat(IEventBus modBus, ModContainer container) {
         container.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
 
+        ModItems.ITEMS.register(modBus);
+        ModDataComponents.COMPONENTS.register(modBus);
+        ModCreativeTab.TABS.register(modBus);
         ManaAttachments.ATTACHMENT_TYPES.register(modBus);
         modBus.addListener(ModNetwork::register);
 

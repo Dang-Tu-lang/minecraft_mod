@@ -1,0 +1,26 @@
+{
+  "itemGroup.phapthuat": "Pháp Thuật Vật Lý",
+  "item.phapthuat.grimoire": "Sách Công Thức",
+  "item.phapthuat.wand": "Pháp Trượng",
+  "item.phapthuat.meter": "Máy Đo",
+
+  "phapthuat.element.nhiet": "Nhiệt",
+  "phapthuat.element.dong": "Động",
+  "phapthuat.element.dien_tu": "Điện từ",
+  "phapthuat.element.quang": "Quang",
+  "phapthuat.element.hoa": "Hóa",
+  "phapthuat.element.hat_nhan": "Hạt nhân",
+  "phapthuat.element.hap_dan": "Hấp dẫn",
+
+  "phapthuat.configuration.title": "Cấu hình Pháp Thuật Vật Lý",
+  "phapthuat.configuration.joulesPerMana": "Số Joule cho 1 mana",
+  "phapthuat.configuration.maxMana": "Mana tối đa",
+  "phapthuat.configuration.regenPerSecond": "Mana hồi mỗi giây",
+  "phapthuat.configuration.halfLifeSeconds": "Chu kỳ nguội của khối và sinh vật (giây)",
+  "phapthuat.configuration.hotSourceHalfLifeSeconds": "Chu kỳ hồi nhiệt của dung nham, magma (giây)",
+  "phapthuat.configuration.doseHalfLifeSeconds": "Chu kỳ giảm liều phóng xạ (giây)",
+  "phapthuat.configuration.siphonGainFactor": "Hệ số mana nhận từ Thu Nhiệt",
+  "phapthuat.configuration.steamExplosionBreaksBlocks": "Nổ hơi nước phá khối",
+  "phapthuat.configuration.airBurstKnockbackPerKpa": "Hất văng mỗi kPa áp suất dư",
+  "phapthuat.configuration.maxTrackedBlocks": "Số khối lưu nhiệt tối đa"
+}
