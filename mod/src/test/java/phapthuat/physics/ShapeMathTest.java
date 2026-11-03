@@ -33,4 +33,10 @@ class ShapeMathTest {
         assertEquals(100, EnergySplit.perUnit(700, 7), 1e-9);
         assertEquals(0, EnergySplit.perUnit(700, 0), 1e-9);
     }
+
+    /** Bán kính lẻ dùng đúng luật "mọi ô cách tâm ≤ r", không làm tròn r. */
+    @Test
+    void fractionalRadius() {
+        assertEquals(81, ShapeMath.sphere(2.5).size());
+    }
 }

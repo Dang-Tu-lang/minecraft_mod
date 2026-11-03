@@ -45,6 +45,13 @@ public record Material(
         return density * PhysicsConstants.CORE_VOLUME_M3;
     }
 
+    /** Nhiệt chuyển pha riêng (J/kg) của bình nguyên mà vật đang nằm ở nhiệt độ này, 0 nếu không ở bình nguyên nào. */
+    public double latentAt(double tempC) {
+        if (meltable() && Math.abs(tempC - meltC) < 0.01) return latentFusion;
+        if (boils() && Math.abs(tempC - boilC) < 0.01) return latentVaporization;
+        return 0;
+    }
+
     /** Độ tăng nhiệt độ đột ngột đủ làm vật nứt vỡ: σ_bền / (E·α). */
     public double crackDeltaK() {
         return brittle() ? tensileStrength / (youngsModulus * thermalExpansion) : Double.NaN;

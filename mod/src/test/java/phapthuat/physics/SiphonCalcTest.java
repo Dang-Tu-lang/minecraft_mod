@@ -20,18 +20,19 @@ class SiphonCalcTest {
         assertEquals(3_927_500, r.manaJoulesDelta(), 2_000);
     }
 
+    /** Tiến độ âm là nhiệt chuyển pha đã bị rút (đang đông dở). */
     @Test
     void lavaPartialLatentFirst() {
         var r = SiphonCalc.siphon(LAVA, 2.7, 1200, 0, 1_000_000, 20);
         assertFalse(r.transformed());
         assertEquals(1200, r.finalTempC(), 1e-9);
-        assertEquals(1_000_000, r.phaseProgressJ(), 1);
+        assertEquals(-1_000_000, r.phaseProgressJ(), 1);
         assertEquals(801_000, r.manaJoulesDelta(), 1_000);
     }
 
     @Test
     void lavaYieldsLessAsItCools() {
-        var a = SiphonCalc.siphon(LAVA, 2.7, 1200, 1_000_000, 1_000_000, 20);
+        var a = SiphonCalc.siphon(LAVA, 2.7, 1200, -1_000_000, 1_000_000, 20);
         assertEquals(916.0, a.finalTempC(), 0.5);
         var b = SiphonCalc.siphon(LAVA, 2.7, a.finalTempC(), a.phaseProgressJ(), 1_000_000, 20);
         assertTrue(b.manaJoulesDelta() < a.manaJoulesDelta());
@@ -73,5 +74,22 @@ class SiphonCalcTest {
         assertEquals(ColdTier.SLOW, SiphonCalc.coldTier(2));
         assertEquals(ColdTier.FREEZE, SiphonCalc.coldTier(5));
         assertEquals(ColdTier.SEVERE, SiphonCalc.coldTier(9));
+    }
+
+    /** Rút đúng nhiệt đông đặc rồi rút tiếp: lần sau phải nguội cảm nhận, không được rút lại nhiệt đông đặc. */
+    @Test
+    void lavaExactLatentThenCools() {
+        var a = SiphonCalc.siphon(LAVA, 2.7, 1200, 0, 1_080_000, 20);
+        var b = SiphonCalc.siphon(LAVA, 2.7, a.finalTempC(), a.phaseProgressJ(), 1_080_000, 20);
+        assertTrue(b.finalTempC() < 900, "lần 2 phải nguội xuống ≈ 866,7°C, có " + b.finalTempC());
+    }
+
+    /** Nước đang sôi dở (tiến độ dương do Gia Nhiệt) phải nhả nhiệt hóa hơi đã nhận trước khi nguội. */
+    @Test
+    void boilingProgressReleasedFirst() {
+        var r = SiphonCalc.siphon(WATER, 1, 100, 1_165_120, 450_000, 20);
+        assertFalse(r.transformed());
+        assertEquals(100, r.finalTempC(), 1e-9);
+        assertEquals(715_120, r.phaseProgressJ(), 1);
     }
 }

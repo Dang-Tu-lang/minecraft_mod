@@ -10,6 +10,12 @@ class ThermalTableTest {
         return new BlockThermal("wood", temp, 0, 20, 20);
     }
 
+    /** Dung nham đã đông hẳn ở 1200°C (tiến độ âm) chưa về tự nhiên, không được bị dọn. */
+    @Test
+    void solidifiedLavaIsNotSettled() {
+        assertTrue(!new BlockThermal("lava", 1200, -1_080_000, 1200, 300).settled());
+    }
+
     @Test
     void decaysTowardNatural() {
         var t = new ThermalTable(10_000);

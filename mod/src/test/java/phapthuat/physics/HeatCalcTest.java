@@ -103,4 +103,14 @@ class HeatCalcTest {
         assertEquals(4, HeatCalc.burnSeconds(100_000, 10_000));
         assertEquals(10, HeatCalc.burnSeconds(1e7, 10_000));
     }
+
+    /** Nước đã bị Thu Nhiệt rút 216 280 J nhiệt đông đặc ở 0°C (tiến độ âm) phải tan lại trước khi đun. */
+    @Test
+    void frozenProgressMustRemeltFirst() {
+        assertEquals(HeatTier.NONE, HeatCalc.heat(WATER, 1, 0, -216_280, 2_500_000).tier());
+        assertEquals(HeatTier.VAPORIZE, HeatCalc.heat(WATER, 1, 0, -216_280, 2_892_000).tier());
+        var partial = HeatCalc.heat(WATER, 1, 0, -216_280, 100_000);
+        assertEquals(0, partial.finalTempC(), 1e-9);
+        assertEquals(-116_280, partial.phaseProgressJ(), 1e-6);
+    }
 }

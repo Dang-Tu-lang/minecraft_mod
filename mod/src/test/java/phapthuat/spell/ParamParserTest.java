@@ -9,6 +9,14 @@ import org.junit.jupiter.api.Test;
 
 class ParamParserTest {
     @Test
+    void choiceClampsToIndex() {
+        var p = SpellParam.choice("direction", List.of("a", "b"), 0);
+        assertEquals(1, p.clamp(7.6));
+        assertEquals(0, p.clamp(-3));
+        assertEquals(1, p.clamp(0.6));
+    }
+
+    @Test
     void parseVietnameseComma() {
         assertEquals(33.3, ParamParser.parse(" 33,3 ").getAsDouble(), 1e-9);
         assertEquals(33.3, ParamParser.parse("33.3").getAsDouble(), 1e-9);

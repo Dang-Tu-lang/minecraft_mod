@@ -21,16 +21,22 @@ public final class SpellCaster {
         Optional<Spell> found = SpellRegistry.get(inscribed.spellId());
         if (found.isEmpty()) return send(player, fail("phapthuat.cast.unknown"));
         Spell spell = found.get();
-        if (!ManaManager.trySpend(player, spell.upfrontCostMana(inscribed))) {
-            return send(player, fail("phapthuat.cast.no_mana"));
-        }
         if (inscribed.shape() == Shape.DAN) {
-            double speed = inscribed.param(Shape.DAN.params().getFirst());
+            double speed = inscribed.param(Targeting.shapeParam(spell, Shape.DAN, "speed"));
+            // Đạn phép tốn thêm động năng lúc phóng (spec 6.5).
+            double launchMana = SpellProjectile.launchEnergyJ(speed) / Config.joulesPerMana();
+            if (!ManaManager.trySpend(player, spell.upfrontCostMana(inscribed) + launchMana)) {
+                return send(player, fail("phapthuat.cast.no_mana"));
+            }
             SpellProjectile.launch(player, inscribed, speed);
             return send(player, new CastReport(true, Component.translatable("phapthuat.cast.launched",
                     spell.displayName(), Fmt.num(speed, 1))));
         }
+        // Chọn mục tiêu trước rồi mới trừ mana: chi phí của một số phép (Nâng) phụ thuộc mục tiêu.
         Targeting.Target target = Targeting.resolve(player, inscribed, spell);
+        if (!ManaManager.trySpend(player, spell.upfrontCostMana(inscribed, player.serverLevel(), target.units()))) {
+            return send(player, fail("phapthuat.cast.no_mana"));
+        }
         return send(player, apply(player, spell, inscribed, target.units(), target.center(), target.face()));
     }
 
@@ -40,11 +46,11 @@ public final class SpellCaster {
         Optional<Spell> found = SpellRegistry.get(inscribed.spellId());
         if (found.isEmpty()) return send(player, fail("phapthuat.cast.unknown"));
         Spell spell = found.get();
-        if (!ManaManager.trySpend(player, spell.upfrontCostMana(inscribed))) {
+        List<SpellUnit> affected = Targeting.filter(player.serverLevel(), units, spell, inscribed.shape());
+        if (!ManaManager.trySpend(player, spell.upfrontCostMana(inscribed, player.serverLevel(), affected))) {
             return send(player, fail("phapthuat.cast.no_mana"));
         }
-        return send(player, apply(player, spell, inscribed,
-                Targeting.filter(player.serverLevel(), units, spell, inscribed.shape()), center, face));
+        return send(player, apply(player, spell, inscribed, affected, center, face));
     }
 
     /** Áp phép mà không trả mana (đạn phép đã trả lúc bắn). Đơn vị được lọc theo {@link Spell#affects}. */

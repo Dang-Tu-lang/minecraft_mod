@@ -9,7 +9,10 @@ import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;
 import net.neoforged.neoforge.client.gui.ConfigurationScreen;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
+import net.neoforged.neoforge.common.NeoForge;
 import phapthuat.client.ManaHudLayer;
+import phapthuat.client.WandHudLayer;
+import phapthuat.client.WandInput;
 import phapthuat.registry.ModEntities;
 import net.minecraft.client.renderer.entity.NoopRenderer;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
@@ -21,6 +24,7 @@ public class PhapThuatClient {
         container.registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
         modBus.addListener(PhapThuatClient::registerGuiLayers);
         modBus.addListener(PhapThuatClient::registerRenderers);
+        NeoForge.EVENT_BUS.register(WandInput.class);
     }
 
     private static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
@@ -31,5 +35,7 @@ public class PhapThuatClient {
     private static void registerGuiLayers(RegisterGuiLayersEvent event) {
         event.registerAbove(VanillaGuiLayers.PLAYER_HEALTH,
                 ResourceLocation.fromNamespaceAndPath(PhapThuat.MODID, "mana"), new ManaHudLayer());
+        event.registerAbove(VanillaGuiLayers.SELECTED_ITEM_NAME,
+                ResourceLocation.fromNamespaceAndPath(PhapThuat.MODID, "wand"), new WandHudLayer());
     }
 }

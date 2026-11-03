@@ -1,0 +1,12 @@
+{
+  "exclude": [
+    "tools/**",
+    ".superpowers/**",
+    ".codegraph/**",
+    "mod/build/**",
+    "mod/run/**",
+    "mod/runs/**",
+    "mod/.gradle/**",
+    "mod/gradle/**"
+  ]
+}

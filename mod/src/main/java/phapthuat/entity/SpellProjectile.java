@@ -40,6 +40,11 @@ public class SpellProjectile extends Projectile {
         super(type, level);
     }
 
+    /** Động năng lúc phóng, ½·m·v² (J). */
+    public static double launchEnergyJ(double speed) {
+        return 0.5 * MASS_KG * speed * speed;
+    }
+
     /** Bắn từ mắt người chơi theo hướng nhìn với tốc độ {@code speed} m/s. */
     public static SpellProjectile launch(ServerPlayer owner, InscribedSpell spell, double speed) {
         SpellProjectile p = new SpellProjectile(ModEntities.SPELL_PROJECTILE.get(), owner.level());

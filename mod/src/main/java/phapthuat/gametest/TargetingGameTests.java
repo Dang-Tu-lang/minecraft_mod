@@ -26,6 +26,8 @@ public class TargetingGameTests {
         ServerPlayer player = helper.makeMockServerPlayerInLevel();
         Vec3 pos = helper.absoluteVec(new Vec3(x, y, z));
         player.moveTo(pos.x, pos.y, pos.z, yaw, pitch);
+        // Hướng nhìn của sinh vật lấy theo đầu; moveTo chỉ xoay thân.
+        player.setYHeadRot(yaw);
         return player;
     }
 
