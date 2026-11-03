@@ -18,7 +18,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.tags.FluidTags;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseFireBlock;
@@ -271,7 +270,7 @@ public final class HeatSpell implements Spell {
             return new UnitResult(Kind.DETONATE, Component.translatable("phapthuat.heat.detonate", name, temp, mana));
         }
         keepHeat(level, pos, now, r);
-        if (isWet(level, pos, state)) return noOxygen(name, temp, mana);
+        if (WorldTemps.inWater(level, pos)) return noOxygen(name, temp, mana);
         if (CampfireBlock.canLight(state) || CandleBlock.canLight(state)) {
             level.setBlock(pos, state.setValue(BlockStateProperties.LIT, true), Block.UPDATE_ALL_IMMEDIATE);
             return new UnitResult(Kind.LIGHT, Component.translatable("phapthuat.heat.light", name, temp, mana));
@@ -299,15 +298,6 @@ public final class HeatSpell implements Spell {
             if (level.getBlockState(pos.relative(d)).isAir()) return pos.relative(d);
         }
         return null;
-    }
-
-    /** Luật oxy: khối ngậm nước hoặc có nước ở ô kề thì không bắt lửa. */
-    private static boolean isWet(ServerLevel level, BlockPos pos, BlockState state) {
-        if (state.getFluidState().is(FluidTags.WATER)) return true;
-        for (Direction d : Direction.values()) {
-            if (level.getFluidState(pos.relative(d)).is(FluidTags.WATER)) return true;
-        }
-        return false;
     }
 
     private static void melt(ServerLevel level, BlockPos pos, Material m) {
@@ -470,7 +460,7 @@ public final class HeatSpell implements Spell {
             BlockPos p = origin.offset(o.dx(), o.dy(), o.dz());
             if (!level.isInWorldBounds(p)) continue;
             BlockState state = level.getBlockState(p);
-            if (state.isAir() && hasFlammableNeighbor(level, p) && !isWet(level, p, state)) {
+            if (state.isAir() && hasFlammableNeighbor(level, p) && !WorldTemps.inWater(level, p)) {
                 level.setBlock(p, BaseFireBlock.getState(level, p), Block.UPDATE_ALL_IMMEDIATE);
             }
         }

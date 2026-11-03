@@ -14,11 +14,17 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import net.minecraft.world.entity.monster.Blaze;
+import phapthuat.Config;
 import phapthuat.PhapThuat;
 import phapthuat.mana.ManaManager;
+import phapthuat.physics.Materials;
+import phapthuat.spell.CastContext;
 import phapthuat.spell.InscribedSpell;
 import phapthuat.spell.Shape;
+import phapthuat.spell.Spell;
 import phapthuat.spell.SpellCaster;
+import phapthuat.spell.SpellRegistry;
 import phapthuat.spell.SpellUnit;
 import phapthuat.spell.impl.SiphonSpell;
 import phapthuat.thermal.WorldTemps;
@@ -98,6 +104,46 @@ public class SiphonSpellGameTests {
         siphon(helper, player, TARGET, 500);
         near(helper, 0, ManaManager.get(player), 1e-9, "mana sau khi rút quá sức");
         helper.assertTrue(player.getTicksFrozen() > 0, "người thi triển phải bị đóng băng");
+        helper.succeed();
+    }
+
+    /** Review: rút đúng 108 (= nhiệt đông đặc) hai lần không được cho mana vô hạn; lần 2 phải làm dung nham nguội. */
+    @GameTest(template = ThermalGameTests.EMPTY)
+    public static void lavaExactLatentThenCools(GameTestHelper helper) {
+        helper.setBlock(TARGET, Blocks.LAVA);
+        ServerPlayer player = caster(helper, 500);
+        siphon(helper, player, TARGET, 108);
+        siphon(helper, player, TARGET, 108);
+        helper.assertBlockPresent(Blocks.LAVA, TARGET);
+        double temp = WorldTemps.currentBlock(helper.getLevel(), helper.absolutePos(TARGET), Materials.LAVA).tempC();
+        helper.assertTrue(temp < 900, "sau lần rút thứ 2 dung nham phải ≈ 866,7°C, có " + temp);
+        helper.succeed();
+    }
+
+    /** Spec 7.3: mob miễn lửa miễn phép nhiệt. */
+    @GameTest(template = ThermalGameTests.EMPTY)
+    public static void siphonIgnoresFireImmune(GameTestHelper helper) {
+        Blaze blaze = helper.spawn(EntityType.BLAZE, TARGET.above());
+        Spell spell = SpellRegistry.get(SiphonSpell.ID).orElseThrow();
+        helper.assertFalse(spell.affects(helper.getLevel(), new SpellUnit.EntityUnit(blaze), Shape.DIEM),
+                "quỷ lửa miễn lửa không được chịu Thu Nhiệt");
+        helper.succeed();
+    }
+
+    /** Khối đổi giữa chừng (không còn là mục tiêu rút nhiệt) phải bị bỏ qua, không crash, không tốn mana. */
+    @GameTest(template = ThermalGameTests.EMPTY)
+    public static void siphonSkipsNonTargetsWithoutCrash(GameTestHelper helper) {
+        BlockPos obsidian = TARGET.east();
+        helper.setBlock(TARGET, Blocks.DIRT);
+        helper.setBlock(obsidian, Blocks.OBSIDIAN);
+        ServerPlayer player = caster(helper, 500);
+        InscribedSpell inscribed = new InscribedSpell(SiphonSpell.ID, Shape.CAU, Map.of("heat", 500.0, "radius", 1.0));
+        CastContext ctx = new CastContext(helper.getLevel(), player, inscribed, Config.joulesPerMana(),
+                Vec3.atCenterOf(helper.absolutePos(TARGET)), null);
+        SpellRegistry.get(SiphonSpell.ID).orElseThrow().apply(ctx, List.of(
+                new SpellUnit.BlockUnit(helper.absolutePos(TARGET)), new SpellUnit.BlockUnit(helper.absolutePos(obsidian))));
+        near(helper, 500, ManaManager.get(player), 1e-9, "mana khi không có mục tiêu hợp lệ");
+        helper.assertBlockPresent(Blocks.OBSIDIAN, obsidian);
         helper.succeed();
     }
 

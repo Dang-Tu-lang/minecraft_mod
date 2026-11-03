@@ -11,13 +11,15 @@ public final class ShapeMath {
 
     private ShapeMath() {}
 
-    /** Mọi ô có dx² + dy² + dz² ≤ r². */
-    public static List<Offset> sphere(int r) {
+    /** Mọi ô có dx² + dy² + dz² ≤ r². Bán kính lẻ (ví dụ 2,5) dùng đúng giá trị đó, không làm tròn. */
+    public static List<Offset> sphere(double r) {
         List<Offset> out = new ArrayList<>();
-        for (int x = -r; x <= r; x++)
-            for (int y = -r; y <= r; y++)
-                for (int z = -r; z <= r; z++)
-                    if (x * x + y * y + z * z <= r * r) out.add(new Offset(x, y, z));
+        int n = (int) Math.floor(r);
+        double r2 = r * r + 1e-9;
+        for (int x = -n; x <= n; x++)
+            for (int y = -n; y <= n; y++)
+                for (int z = -n; z <= n; z++)
+                    if (x * x + y * y + z * z <= r2) out.add(new Offset(x, y, z));
         return out;
     }
 

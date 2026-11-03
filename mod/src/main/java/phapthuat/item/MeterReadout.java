@@ -50,8 +50,7 @@ public final class MeterReadout {
         } else if (hit instanceof BlockHitResult bh && hit.getType() != HitResult.Type.MISS) {
             BlockPos pos = bh.getBlockPos();
             BlockState state = level.getBlockState(pos);
-            inWater = !state.getFluidState().isEmpty()
-                    || !level.getFluidState(pos.relative(bh.getDirection())).isEmpty();
+            inWater = WorldTemps.inWater(level, pos);
             var material = MaterialLookup.of(state);
             if (material.isPresent()) {
                 Material m = material.get();

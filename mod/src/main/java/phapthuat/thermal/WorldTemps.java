@@ -1,8 +1,10 @@
 package phapthuat.thermal;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.EntityTypeTags;
+import net.minecraft.tags.FluidTags;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
@@ -48,6 +50,15 @@ public final class WorldTemps {
 
     public static void saveBlock(ServerLevel level, BlockPos pos, BlockThermal value) {
         ThermalStore.get(level).put(pos, value, level.getGameTime());
+    }
+
+    /** Luật oxy (spec 8.1): khối ngậm nước, hoặc có nước ở một trong 6 ô kề, là "trong nước". Máy Đo đo đúng luật này. */
+    public static boolean inWater(Level level, BlockPos pos) {
+        if (level.getFluidState(pos).is(FluidTags.WATER)) return true;
+        for (Direction d : Direction.values()) {
+            if (level.getFluidState(pos.relative(d)).is(FluidTags.WATER)) return true;
+        }
+        return false;
     }
 
     public static boolean isUndead(Entity entity) {

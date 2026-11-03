@@ -59,7 +59,7 @@ public final class Targeting {
             case DIEM -> List.of(pointUnit(level, aim));
             case TIA -> rayUnits(player, paramOf(spell, inscribed, shape, "length"));
             case DUONG -> pathUnits(player, aim.cell());
-            case CAU -> sphereUnits(level, aim.cell(), (int) Math.round(paramOf(spell, inscribed, shape, "radius")));
+            case CAU -> sphereUnits(level, aim.cell(), paramOf(spell, inscribed, shape, "radius"));
             case TUONG -> wallUnits(level, wallCenter(aim), (int) Math.round(paramOf(spell, inscribed, shape, "width")),
                     (int) Math.round(paramOf(spell, inscribed, shape, "height")), facingAlongX(player));
             case BAN_THAN -> List.of(new EntityUnit(player));
@@ -91,7 +91,7 @@ public final class Targeting {
         return state.isAir() ? new AirUnit(pos) : new BlockUnit(pos);
     }
 
-    public static List<SpellUnit> sphereUnits(ServerLevel level, BlockPos center, int radius) {
+    public static List<SpellUnit> sphereUnits(ServerLevel level, BlockPos center, double radius) {
         List<SpellUnit> units = new ArrayList<>();
         Set<BlockPos> cells = new HashSet<>();
         for (ShapeMath.Offset o : ShapeMath.sphere(radius)) {

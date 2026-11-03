@@ -5,6 +5,7 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
 import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.neoforge.event.level.BlockEvent;
 import net.neoforged.neoforge.event.tick.EntityTickEvent;
 import net.neoforged.neoforge.event.tick.LevelTickEvent;
 import phapthuat.physics.ColdTier;
@@ -19,6 +20,12 @@ public final class ThermalTicker {
         if (event.getLevel() instanceof ServerLevel level && level.getGameTime() % 200 == 0) {
             ThermalStore.get(level).sweep(level.getGameTime());
         }
+    }
+
+    /** Khối mới đặt vào một ô không thừa hưởng nhiệt đã lưu của khối cũ ở đó (spec 6.8), kể cả khi cùng vật liệu. */
+    @SubscribeEvent
+    public static void onPlace(BlockEvent.EntityPlaceEvent event) {
+        if (event.getLevel() instanceof ServerLevel level) ThermalStore.get(level).remove(event.getPos());
     }
 
     @SubscribeEvent

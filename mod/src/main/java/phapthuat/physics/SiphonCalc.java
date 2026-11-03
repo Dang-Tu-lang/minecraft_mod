@@ -27,12 +27,18 @@ public final class SiphonCalc {
         return ColdTier.NONE;
     }
 
+    /**
+     * @param phaseProgressJ tiến độ chuyển pha đã lưu: dương là nhiệt đã hấp thụ khi đun (ví dụ nước đang sôi dở),
+     *     âm là nhiệt đã bị rút (đang đông dở; −m·L là đã đông hẳn). Kết quả trả về theo cùng quy ước.
+     */
     public static SiphonResult siphon(Material m, double massKg, double startTempC, double phaseProgressJ,
             double heatJ, double ambientC) {
         Draw d = new Draw(startTempC, phaseProgressJ, heatJ, ambientC);
-        boolean transformed;
+        boolean transformed = false;
 
-        if (!Double.isNaN(m.maxExtractableJ())) {
+        if (!d.releaseAbsorbed()) {
+            // Hết nhiệt yêu cầu ngay trong lúc nhả nhiệt chuyển pha đã hấp thụ: vật vẫn ở bình nguyên đó.
+        } else if (!Double.isNaN(m.maxExtractableJ())) {
             transformed = d.finite(m.maxExtractableJ());
         } else if (!Double.isNaN(m.naturalTempC())) {
             transformed = drainHot(m, massKg, d, ambientC);
@@ -42,7 +48,6 @@ public final class SiphonCalc {
                     && d.plateau(massKg * ice.latentFusion(), ice.meltC());
         } else {
             d.coolTo(massKg, m.specificHeat(), FLOOR_C);
-            transformed = false;
         }
 
         double startK = PhysicsConstants.toKelvin(startTempC);
@@ -55,12 +60,14 @@ public final class SiphonCalc {
                 d.remainingJ > EPS);
     }
 
-    /** Dung nham, magma: nhả nhiệt đông đặc trước (nếu đang ở điểm nóng chảy), rồi nguội về môi trường. */
+    /**
+     * Dung nham, magma: nhả nhiệt đông đặc trước (nếu đang ở điểm nóng chảy), rồi nguội về môi trường. Đông hẳn thì
+     * tiến độ giữ ở −m·L, nên lần rút sau không rút lại nhiệt đông đặc; tiến độ nguội dần về 0 chính là lúc dung
+     * nham tự nóng chảy lại.
+     */
     private static boolean drainHot(Material m, double massKg, Draw d, double ambientC) {
         if (m.meltable() && d.tempC >= m.meltC() - EPS) {
             if (!d.plateau(massKg * m.latentFusion(), m.meltC())) return false;
-            d.progressJ = 0;
-            d.tempC = m.meltC() - EPS;
         }
         return d.coolTo(massKg, m.specificHeat(), ambientC);
     }
@@ -81,12 +88,24 @@ public final class SiphonCalc {
             this.ambientC = ambientC;
         }
 
+        /** Nhả nhiệt chuyển pha đã hấp thụ khi đun (tiến độ dương) ở nhiệt độ hiện tại. Trả false nếu chưa nhả hết. */
+        boolean releaseAbsorbed() {
+            if (progressJ <= 0) return true;
+            double take = Math.min(remainingJ, progressJ);
+            remainingJ -= take;
+            progressJ -= take;
+            book(take, tempC);
+            if (progressJ > EPS) return false;
+            progressJ = 0;
+            return true;
+        }
+
         /** Nguồn nhiệt hữu hạn (lửa): rút tối đa phần còn lại; hết thì tắt và về nhiệt độ môi trường. */
         boolean finite(double maxJ) {
-            double available = Math.max(0, maxJ - progressJ);
+            double available = Math.max(0, maxJ + progressJ);
             double take = Math.min(remainingJ, available);
             remainingJ -= take;
-            progressJ += take;
+            progressJ -= take;
             book(take, tempC);
             if (take + EPS < available) return false;
             tempC = ambientC;
@@ -111,12 +130,12 @@ public final class SiphonCalc {
             return false;
         }
 
-        /** Rút nhiệt chuyển pha (đông đặc) ở nhiệt độ {@code atC}. Trả false nếu chưa rút hết. */
+        /** Rút nhiệt chuyển pha (đông đặc) ở nhiệt độ {@code atC}; tiến độ âm ghi phần đã rút. Trả false nếu chưa hết. */
         boolean plateau(double latentTotalJ, double atC) {
-            double need = Math.max(0, latentTotalJ - progressJ);
+            double need = Math.max(0, latentTotalJ + progressJ);
             double take = Math.min(remainingJ, need);
             remainingJ -= take;
-            progressJ += take;
+            progressJ -= take;
             book(take, atC);
             return take + EPS >= need;
         }

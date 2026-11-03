@@ -20,21 +20,29 @@ public final class HeatCalc {
 
     private HeatCalc() {}
 
+    /**
+     * @param phaseProgressJ tiến độ chuyển pha đã lưu: dương là nhiệt đã hấp thụ ở bình nguyên hiện tại, âm là nhiệt
+     *     đã bị Thu Nhiệt rút (ví dụ nước đang đông dở ở 0°C) — phần âm phải được trả lại trước khi vật nóng lên.
+     */
     public static HeatResult heat(Material m, double massKg, double startTempC, double phaseProgressJ,
             double energyJ) {
-        Walk walk = walk(m, massKg, startTempC, phaseProgressJ, energyJ);
-
-        HeatTier tier = walk.tier;
-        double excess = walk.excessJ;
-        if (tier.compareTo(HeatTier.CRACK) < 0 && cracks(m, massKg, energyJ)) {
-            tier = HeatTier.CRACK;
-            excess = energyJ - crackRequirement(m, massKg);
-        }
-
-        double requirement = highestTierRequirement(m, massKg, startTempC, phaseProgressJ);
+        double debt = Math.max(0, -phaseProgressJ);
+        double progress = Math.max(0, phaseProgressJ);
+        double requirement = debt + highestTierRequirement(m, massKg, startTempC, progress);
         boolean backlash = requirement > 0 && energyJ + EPS >= 3 * requirement;
         int radius = backlash ? (int) Math.min(4, 1 + Math.floor(energyJ / requirement - 3 + 1e-9)) : 0;
+        if (energyJ + EPS < debt) {
+            return new HeatResult(HeatTier.NONE, startTempC, -(debt - energyJ), 0, requirement, backlash, radius);
+        }
 
+        double energy = Math.max(0, energyJ - debt);
+        Walk walk = walk(m, massKg, startTempC, progress, energy);
+        HeatTier tier = walk.tier;
+        double excess = walk.excessJ;
+        if (tier.compareTo(HeatTier.CRACK) < 0 && cracks(m, massKg, energy)) {
+            tier = HeatTier.CRACK;
+            excess = energy - crackRequirement(m, massKg);
+        }
         return new HeatResult(tier, walk.tempC, walk.progressJ, Math.max(0, excess), requirement, backlash, radius);
     }
 

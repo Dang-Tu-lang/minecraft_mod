@@ -5,6 +5,8 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
+import org.jetbrains.annotations.Nullable;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
@@ -76,19 +78,23 @@ public final class SiphonSpell implements Spell {
         return ACTIVATION_COST_MANA;
     }
 
-    /** Dung nham nguồn, magma, lửa, lửa trại đang cháy, nước nguồn và mọi sinh vật. */
+    /** Dung nham nguồn, magma, lửa, lửa trại đang cháy, nước nguồn và sinh vật không miễn lửa (spec 7.3). */
     @Override
     public boolean affects(ServerLevel level, SpellUnit unit, Shape shape) {
         return switch (unit) {
-            case SpellUnit.BlockUnit b -> {
-                BlockState state = level.getBlockState(b.pos());
-                Material m = MaterialLookup.of(state).orElse(null);
-                yield m == Materials.LAVA || m == Materials.MAGMA || m == Materials.FIRE || m == Materials.CAMPFIRE
-                        || (m == Materials.WATER && state.is(Blocks.WATER));
-            }
+            case SpellUnit.BlockUnit b -> target(level.getBlockState(b.pos())) != null;
             case SpellUnit.AirUnit a -> false;
-            case SpellUnit.EntityUnit e -> e.entity() instanceof LivingEntity living && living.isAlive();
+            case SpellUnit.EntityUnit e -> e.entity() instanceof LivingEntity living && living.isAlive()
+                    && !living.fireImmune();
         };
+    }
+
+    /** Vật liệu rút nhiệt được của khối này, null nếu khối không phải mục tiêu của Thu Nhiệt. */
+    private static @Nullable Material target(BlockState state) {
+        Material m = MaterialLookup.of(state).orElse(null);
+        boolean ok = m == Materials.LAVA || m == Materials.MAGMA || m == Materials.FIRE || m == Materials.CAMPFIRE
+                || (m == Materials.WATER && state.is(Blocks.WATER));
+        return ok ? m : null;
     }
 
     @Override
@@ -100,11 +106,17 @@ public final class SiphonSpell implements Spell {
         List<Drawn> drawn = new ArrayList<>();
         for (SpellUnit unit : units) {
             switch (unit) {
-                case SpellUnit.BlockUnit b -> drawn.add(siphonBlock(ctx.level(), b.pos(), perUnit));
+                case SpellUnit.BlockUnit b -> {
+                    Drawn d = siphonBlock(ctx.level(), b.pos(), perUnit);
+                    if (d != null) drawn.add(d);
+                }
                 case SpellUnit.EntityUnit e when e.entity() instanceof LivingEntity living ->
                         drawn.add(siphonEntity(living, perUnit));
                 default -> {}
             }
+        }
+        if (drawn.isEmpty()) {
+            return new CastReport(false, Component.translatable("phapthuat.siphon.nothing", displayName()));
         }
 
         double factor = Config.SIPHON_GAIN_FACTOR.get();
@@ -149,9 +161,11 @@ public final class SiphonSpell implements Spell {
         caster.setTicksFrozen(caster.getTicksRequiredToFreeze());
     }
 
-    private static Drawn siphonBlock(ServerLevel level, BlockPos pos, double joules) {
+    /** Null nếu khối đã đổi giữa lúc chọn mục tiêu và lúc rút (không còn là mục tiêu): bỏ qua, không tốn gì. */
+    private static @Nullable Drawn siphonBlock(ServerLevel level, BlockPos pos, double joules) {
         BlockState state = level.getBlockState(pos);
-        Material m = MaterialLookup.of(state).orElseThrow();
+        Material m = target(state);
+        if (m == null) return null;
         double ambient = WorldTemps.ambientC(level, pos);
         BlockThermal now = WorldTemps.currentBlock(level, pos, m);
         // Lửa và lửa trại không có khối lượng lõi: nhiệt rút được là con số cố định trong bảng.
@@ -181,15 +195,17 @@ public final class SiphonSpell implements Spell {
         return Blocks.AIR.defaultBlockState();
     }
 
+    /** Tiến độ âm là nhiệt đã rút ở bình nguyên (đang đông dở, hoặc phần nhiệt của lửa đã rút). */
     private static Component partialLine(Material m, Component name, SiphonResult r) {
+        double removed = -r.phaseProgressJ();
         if (!Double.isNaN(m.maxExtractableJ())) {
             return Component.translatable("phapthuat.siphon.fire_partial", name,
-                    Fmt.num(100 * r.phaseProgressJ() / m.maxExtractableJ(), 0));
+                    Fmt.num(100 * removed / m.maxExtractableJ(), 0));
         }
         double latent = freezeLatent(m, r.finalTempC()) * m.coreMassKg();
-        if (latent > 0 && r.phaseProgressJ() >= 1) {
+        if (latent > 0 && removed >= 1) {
             return Component.translatable("phapthuat.siphon.cooled_phase", name, Fmt.tempC(r.finalTempC()),
-                    Fmt.num(100 * Math.min(1, r.phaseProgressJ() / latent), 0));
+                    Fmt.num(100 * Math.min(1, removed / latent), 0));
         }
         return Component.translatable("phapthuat.siphon.cooled", name, Fmt.tempC(r.finalTempC()));
     }
