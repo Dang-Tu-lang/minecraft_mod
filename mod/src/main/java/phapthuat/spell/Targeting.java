@@ -75,8 +75,13 @@ public final class Targeting {
     }
 
     private static double paramOf(Spell spell, InscribedSpell inscribed, Shape shape, String key) {
-        for (SpellParam p : shape.params()) {
-            if (p.key().equals(key)) return inscribed.param(p);
+        return inscribed.param(shapeParam(spell, shape, key));
+    }
+
+    /** Thông số {@code key} của thao tác, theo khoảng mà phép này quy định ({@link Spell#shapeParams}). */
+    public static SpellParam shapeParam(Spell spell, Shape shape, String key) {
+        for (SpellParam p : spell.shapeParams(shape)) {
+            if (p.key().equals(key)) return p;
         }
         throw new IllegalArgumentException("Thao tác " + shape + " không có thông số " + key);
     }

@@ -97,6 +97,10 @@ final class GrimoireText {
 
     /** "Năng lượng (mana): 0–1000" — nhãn của một thông số, dùng cả trong trang phép lẫn ô nhập. */
     static Component paramLabel(SpellParam p) {
+        if (p.isChoice()) {
+            String options = p.choiceLangKeys().stream().map(I18n::get).collect(Collectors.joining(" / "));
+            return Component.translatable("phapthuat.book.param_choice", Component.translatable(p.langKey()), options);
+        }
         return Component.translatable("phapthuat.book.param", Component.translatable(p.langKey()),
                 Component.translatable(p.unitLangKey()), Fmt.num(p.min(), 0), Fmt.num(p.max(), 0));
     }

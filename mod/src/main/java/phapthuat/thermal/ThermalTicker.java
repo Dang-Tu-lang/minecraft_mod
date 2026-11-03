@@ -17,9 +17,9 @@ public final class ThermalTicker {
 
     @SubscribeEvent
     public static void onLevelTick(LevelTickEvent.Post event) {
-        if (event.getLevel() instanceof ServerLevel level && level.getGameTime() % 200 == 0) {
-            ThermalStore.get(level).sweep(level.getGameTime());
-        }
+        if (!(event.getLevel() instanceof ServerLevel level)) return;
+        if (level.getGameTime() % 200 == 0) ThermalStore.get(level).sweep(level.getGameTime());
+        if (level.getGameTime() % 20 == 0) PlacedLights.get(level).sweep(level);
     }
 
     /** Khối mới đặt vào một ô không thừa hưởng nhiệt đã lưu của khối cũ ở đó (spec 6.8), kể cả khi cùng vật liệu. */

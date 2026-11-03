@@ -44,11 +44,15 @@ public final class WandHudLayer implements LayeredDraw.Layer {
         Component name = spell.map(Spell::displayName).orElse(Component.literal(inscribed.spellId()));
         Component shape = Component.translatable(inscribed.shape().langKey());
 
-        List<SpellParam> params = new ArrayList<>(spell.map(Spell::params).orElse(List.of()));
-        params.addAll(inscribed.shape().params());
+        List<SpellParam> params = spell.map(s -> s.allParams(inscribed.shape())).orElse(List.of());
         if (params.isEmpty()) return Component.translatable("phapthuat.wand.hud_short", index, WandSlots.SIZE, name, shape);
         List<String> parts = new ArrayList<>();
         for (SpellParam p : params) {
+            if (p.isChoice()) {
+                // Thông số lựa chọn hiện tên lựa chọn (ví dụ "Kéo") thay vì chỉ số.
+                parts.add(I18n.get(p.choiceLangKeys().get((int) inscribed.param(p))));
+                continue;
+            }
             parts.add(I18n.get("phapthuat.param." + p.key()).toLowerCase(Locale.ROOT) + " "
                     + Fmt.num(inscribed.param(p), 1) + " " + I18n.get(p.unitLangKey()));
         }

@@ -26,10 +26,8 @@ public final class InscribeValidator {
     public static Optional<InscribedSpell> validate(InscribedSpell raw) {
         Optional<Spell> spell = SpellRegistry.get(raw.spellId());
         if (spell.isEmpty() || !spell.get().shapes().contains(raw.shape())) return Optional.empty();
-        List<SpellParam> params = new ArrayList<>(spell.get().params());
-        params.addAll(raw.shape().params());
         Map<String, Double> clean = new HashMap<>();
-        for (SpellParam p : params) {
+        for (SpellParam p : spell.get().allParams(raw.shape())) {
             Double v = raw.params().get(p.key());
             if (v == null) {
                 clean.put(p.key(), p.defaultValue());

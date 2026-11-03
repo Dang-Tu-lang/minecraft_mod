@@ -61,6 +61,7 @@ public final class GrimoireScreen extends Screen {
     private Shape shape;
     private int slot;
     private final Map<String, String> typed = new HashMap<>();
+    private final Map<String, Integer> choices = new HashMap<>();
     @Nullable
     private Component status;
 
@@ -69,6 +70,7 @@ public final class GrimoireScreen extends Screen {
 
     private final List<Label> labels = new ArrayList<>();
     private final Map<SpellParam, EditBox> inputs = new LinkedHashMap<>();
+    private final List<SpellParam> choiceParams = new ArrayList<>();
     private List<FormattedCharSequence> lines = List.of();
     private int pageX;
     private int pageY;
@@ -92,6 +94,7 @@ public final class GrimoireScreen extends Screen {
     protected void init() {
         labels.clear();
         inputs.clear();
+        choiceParams.clear();
         inscribeButton = null;
 
         int y = MARGIN;
@@ -144,8 +147,7 @@ public final class GrimoireScreen extends Screen {
     private int buildInscribe(Spell spell) {
         List<Shape> shapes = spell.shapes().stream().sorted().toList();
         if (shape == null || !shapes.contains(shape)) shape = shapes.getFirst();
-        List<SpellParam> params = new ArrayList<>(spell.params());
-        params.addAll(shape.params());
+        List<SpellParam> params = spell.allParams(shape);
 
         int pageWidth = pageRight - pageX;
         int shapeCols = Math.max(1, pageWidth / (SHAPE_WIDTH + 2));
@@ -173,6 +175,23 @@ public final class GrimoireScreen extends Screen {
             int py = y + (i / paramCols) * 32;
             Component label = GrimoireText.paramLabel(p);
             labels.add(new Label(label, px, py, LABEL_COLOR));
+            if (p.isChoice()) {
+                // Thông số lựa chọn: một dãy nút, nút đang chọn bị khóa.
+                int n = p.choiceLangKeys().size();
+                int bw = (PARAM_WIDTH - 2 * (n - 1)) / n;
+                int chosen = chosenIndex(p);
+                for (int c = 0; c < n; c++) {
+                    int index = c;
+                    Button b = addRenderableWidget(Button.builder(Component.translatable(p.choiceLangKeys().get(c)),
+                            btn -> {
+                                choices.put(p.key(), index);
+                                rebuildWidgets();
+                            }).bounds(px + c * (bw + 2), py + 11, bw, 16).build());
+                    b.active = c != chosen;
+                }
+                choiceParams.add(p);
+                continue;
+            }
             EditBox box = new EditBox(font, px, py + 11, PARAM_WIDTH, 16, label);
             box.setMaxLength(16);
             box.setValue(typed.getOrDefault(p.key(), plain(p.defaultValue())));
@@ -217,8 +236,13 @@ public final class GrimoireScreen extends Screen {
         if (inscribeButton != null) inscribeButton.active = all;
     }
 
+    private int chosenIndex(SpellParam p) {
+        return choices.getOrDefault(p.key(), (int) p.defaultValue());
+    }
+
     private void inscribe(Spell spell) {
         Map<String, Double> values = new HashMap<>();
+        for (SpellParam p : choiceParams) values.put(p.key(), (double) chosenIndex(p));
         for (Map.Entry<SpellParam, EditBox> e : inputs.entrySet()) {
             OptionalDouble v = ParamParser.parse(e.getValue().getValue());
             if (v.isEmpty()) return;

@@ -101,6 +101,7 @@
   "phapthuat.book.inscribe.slot": "Ô:",
   "phapthuat.book.inscribe.button": "Khắc phép",
   "phapthuat.book.param": "%s (%s): %s–%s",
+  "phapthuat.book.param_choice": "%s: %s",
   "phapthuat.book.spell.element": "Nguyên tố: %s",
   "phapthuat.book.spell.shapes": "Thao tác được phép: %s",
 
