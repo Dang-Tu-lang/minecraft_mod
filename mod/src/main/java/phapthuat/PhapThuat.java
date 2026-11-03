@@ -19,6 +19,7 @@ import phapthuat.registry.ModItems;
 import phapthuat.spell.SpellRegistry;
 import phapthuat.spell.TimedEffects;
 import phapthuat.spell.impl.HeatSpell;
+import phapthuat.spell.impl.SiphonSpell;
 import phapthuat.thermal.ThermalAttachments;
 import phapthuat.thermal.ThermalTicker;
 
@@ -43,5 +44,6 @@ public class PhapThuat {
         NeoForge.EVENT_BUS.register(TimedEffects.class);
 
         SpellRegistry.register(new HeatSpell());
+        SpellRegistry.register(new SiphonSpell());
     }
 }
