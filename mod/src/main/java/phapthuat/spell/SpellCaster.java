@@ -21,11 +21,14 @@ public final class SpellCaster {
         Optional<Spell> found = SpellRegistry.get(inscribed.spellId());
         if (found.isEmpty()) return send(player, fail("phapthuat.cast.unknown"));
         Spell spell = found.get();
-        if (!ManaManager.trySpend(player, spell.upfrontCostMana(inscribed))) {
+        boolean projectile = inscribed.shape() == Shape.DAN;
+        double speed = projectile ? inscribed.param(Shape.DAN.params().getFirst()) : 0;
+        // Đạn phép tốn thêm động năng lúc phóng (spec 6.5).
+        double launchMana = projectile ? SpellProjectile.launchEnergyJ(speed) / Config.joulesPerMana() : 0;
+        if (!ManaManager.trySpend(player, spell.upfrontCostMana(inscribed) + launchMana)) {
             return send(player, fail("phapthuat.cast.no_mana"));
         }
-        if (inscribed.shape() == Shape.DAN) {
-            double speed = inscribed.param(Shape.DAN.params().getFirst());
+        if (projectile) {
             SpellProjectile.launch(player, inscribed, speed);
             return send(player, new CastReport(true, Component.translatable("phapthuat.cast.launched",
                     spell.displayName(), Fmt.num(speed, 1))));

@@ -105,6 +105,11 @@
   "phapthuat.cast.no_mana": "Không đủ mana",
   "phapthuat.cast.launched": "%s: đạn phép đã bay với %s m/s",
 
+  "phapthuat.wand.empty_slot": "Ô %s chưa khắc phép",
+  "phapthuat.wand.hud": "[%s/%s] %s · %s · %s",
+  "phapthuat.wand.hud_short": "[%s/%s] %s · %s",
+  "phapthuat.wand.hud_empty": "[%s/%s] (trống)",
+
   "phapthuat.yes": "có",
   "phapthuat.no": "không",
 
