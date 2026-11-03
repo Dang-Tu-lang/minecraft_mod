@@ -21,6 +21,14 @@ class MaterialsTest {
     }
 
     @Test
+    void latentAtPlateau() {
+        assertEquals(334_000, Materials.ICE.latentAt(0), 1e-9);
+        assertEquals(2_257_000, Materials.WATER.latentAt(100), 1e-9);
+        assertEquals(0, Materials.WATER.latentAt(50), 1e-9);
+        assertEquals(0, Materials.WOOD.latentAt(300), 1e-9);
+    }
+
+    @Test
     void crackDeltas() {
         assertEquals(25.0, Materials.STONE.crackDeltaK(), 1e-9);
         assertEquals(47.619, Materials.GLASS.crackDeltaK(), 1e-3);

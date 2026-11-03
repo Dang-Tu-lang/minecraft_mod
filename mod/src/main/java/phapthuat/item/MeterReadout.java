@@ -58,7 +58,7 @@ public final class MeterReadout {
                 BlockThermal t = WorldTemps.currentBlock(level, pos, m);
                 say(player, Component.translatable("phapthuat.meter.block",
                         Component.translatable("phapthuat.material." + m.id()), Fmt.tempC(t.tempC())));
-                double latent = latentAt(m, t.tempC()) * m.coreMassKg();
+                double latent = m.latentAt(t.tempC()) * m.coreMassKg();
                 if (latent > 0 && t.phaseProgressJ() >= 1) {
                     say(player, Component.translatable("phapthuat.meter.phase",
                             Fmt.num(100 * Math.min(1, t.phaseProgressJ() / latent), 0)));
@@ -79,13 +79,6 @@ public final class MeterReadout {
         var bb = e.getBoundingBox();
         String id = BuiltInRegistries.ENTITY_TYPE.getKey(e.getType()).toString();
         return EntityMass.kg(id, bb.getXsize() * bb.getYsize() * bb.getZsize());
-    }
-
-    /** Nhiệt chuyển pha riêng ở bình nguyên mà vật đang nằm (J/kg), 0 nếu không ở bình nguyên nào. */
-    private static double latentAt(Material m, double tempC) {
-        if (m.meltable() && Math.abs(tempC - m.meltC()) < 0.01) return m.latentFusion();
-        if (m.boils() && Math.abs(tempC - m.boilC()) < 0.01) return m.latentVaporization();
-        return 0;
     }
 
     private static Component distance(ServerPlayer player, double meters) {
