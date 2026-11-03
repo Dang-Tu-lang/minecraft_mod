@@ -137,6 +137,22 @@ dependencies {
     // For more info:
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
+
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+tasks.named('test', Test) {
+    useJUnitPlatform()
+}
+
+// Chữ trong game luôn là tiếng Việt: en_us.json được sao từ vi_vn.json lúc build, nên chỉ cần sửa một file.
+tasks.named('processResources', ProcessResources) {
+    from('src/main/resources/assets/phapthuat/lang') {
+        include 'vi_vn.json'
+        into 'assets/phapthuat/lang'
+        rename { 'en_us.json' }
+    }
 }
 
 // This block of code expands all declared replace properties in the specified resource targets.
@@ -153,6 +169,7 @@ var generateModMetadata = tasks.register("generateModMetadata", ProcessResources
             mod_version            : mod_version,
     ]
     inputs.properties replaceProperties
+    filteringCharset = 'UTF-8'
     expand replaceProperties
     from "src/main/templates"
     into "build/generated/sources/modMetadata"

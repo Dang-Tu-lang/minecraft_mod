@@ -4,7 +4,7 @@
 
 **Goal:** Dựng toàn bộ nền móng của mod "Pháp Thuật Vật Lý" (mana, Sách Công Thức, Pháp Trượng, Máy Đo, 7 thao tác, lưu nhiệt và nguội dần) cùng hai phép Nhiệt là Gia Nhiệt và Thu Nhiệt, ở mức chơi thử được trong game.
 
-**Architecture:** Lõi vật lý là Java thuần (package `dev.oasm.phapthuat.physics`, không import `net.minecraft`), kiểm bằng JUnit với đúng các ví dụ số của spec. Phần Minecraft (NeoForge 1.21.1) chỉ đọc thế giới, gọi lõi, rồi áp kết quả. Phép và thao tác là các lớp đăng ký vào `SpellRegistry`/`Shape`, tự khai báo thông số, để sách và trượng tự hiển thị. Hiệu ứng trong thế giới được kiểm bằng GameTest.
+**Architecture:** Lõi vật lý là Java thuần (package `phapthuat.physics`, không import `net.minecraft`), kiểm bằng JUnit với đúng các ví dụ số của spec. Phần Minecraft (NeoForge 1.21.1) chỉ đọc thế giới, gọi lõi, rồi áp kết quả. Phép và thao tác là các lớp đăng ký vào `SpellRegistry`/`Shape`, tự khai báo thông số, để sách và trượng tự hiển thị. Hiệu ứng trong thế giới được kiểm bằng GameTest.
 
 **Tech Stack:** Java 21, NeoForge 21.1.265 (ModDevGradle 2.0.148), Minecraft 1.21.1, JUnit 5, GameTest của Minecraft.
 
@@ -16,7 +16,7 @@
 
 - Minecraft **1.21.1**, NeoForge **21.1.265**, Java 21. Project tại `D:\code_base\New folder\mod`.
 - Mọi thứ nằm trong `D:\code_base\New folder`. Không cài gì ra ngoài. Build bằng `D:\code_base\New folder\mod\g.cmd` (gọi bằng đường dẫn đầy đủ).
-- Mod id `phapthuat`, package gốc `dev.oasm.phapthuat`, tên hiển thị "Pháp Thuật Vật Lý".
+- Mod id `phapthuat`, package gốc `phapthuat`, tên hiển thị "Pháp Thuật Vật Lý".
 - Toàn bộ chữ trong game bằng **tiếng Việt có dấu**. `vi_vn.json` và `en_us.json` có **cùng nội dung tiếng Việt**.
 - **Không có máy tính hộ:** giao diện không bao giờ hiển thị trước chi phí cần thiết hay khả năng thành công. Kết quả chỉ báo **sau khi thi triển**. Sách in công thức và bảng dữ liệu, **không in đáp số** của các ví dụ trong spec.
 - Mọi số liệu nằm ở một chỗ: `PhysicsConstants`, `Materials`, `EntityMass` (vật lý) và `Config` (cân bằng). Sách đọc từ chính chỗ đó.
@@ -43,15 +43,15 @@
 - Modify: `mod/g.cmd` (luôn chạy từ thư mục của nó)
 - Modify: `mod/src/main/templates/META-INF/neoforge.mods.toml` (description)
 - Delete: `mod/src/main/java/com/example/` (cả thư mục)
-- Create: `mod/src/main/java/dev/oasm/phapthuat/PhapThuat.java`, `PhapThuatClient.java`, `Config.java`
-- Create: `mod/src/test/java/dev/oasm/phapthuat/SmokeTest.java`
+- Create: `mod/src/main/java/phapthuat/PhapThuat.java`, `PhapThuatClient.java`, `Config.java`
+- Create: `mod/src/test/java/phapthuat/SmokeTest.java`
 - Create: `.gitignore` ở `D:\code_base\New folder` (bỏ qua `tools/`)
 - Delete: `mod/build-first.log`
 
 **Interfaces:**
 - Produces: `PhapThuat.MODID = "phapthuat"`, `PhapThuat.LOGGER`, `PhapThuat(IEventBus modBus, ModContainer container)` là nơi mọi task sau đăng ký `DeferredRegister` và listener. `Config` giữ `ModConfigSpec` loại COMMON (Task 6 thêm giá trị).
 
-- [ ] **Step 1:** Sửa `gradle.properties`: `mod_id=phapthuat`, `mod_name=Pháp Thuật Vật Lý`, `mod_group_id=dev.oasm.phapthuat`, `mod_license=All Rights Reserved`. Sửa description trong `neoforge.mods.toml` thành `Phép thuật dựng trên vật lý thật.`
+- [ ] **Step 1:** Sửa `gradle.properties`: `mod_id=phapthuat`, `mod_name=Pháp Thuật Vật Lý`, `mod_group_id=phapthuat`, `mod_license=All Rights Reserved`. Sửa description trong `neoforge.mods.toml` thành `Phép thuật dựng trên vật lý thật.`
 - [ ] **Step 2:** Xóa package `com.example.examplemod` và `assets/examplemod`. Tạo `PhapThuat` (`@Mod(PhapThuat.MODID)`, chưa đăng ký gì ngoài config), `PhapThuatClient` (`@Mod(value = MODID, dist = Dist.CLIENT)`, đăng ký `ConfigurationScreen` như template cũ), `Config` (builder rỗng + `SPEC`).
 - [ ] **Step 3:** Trong `build.gradle` thêm:
 
@@ -71,9 +71,9 @@ tasks.named('test', Test) { useJUnitPlatform() }
 ### Task 2: Hằng số và bảng vật liệu
 
 **Files:**
-- Create: `mod/src/main/java/dev/oasm/phapthuat/physics/PhysicsConstants.java`
+- Create: `mod/src/main/java/phapthuat/physics/PhysicsConstants.java`
 - Create: `.../physics/Material.java`, `.../physics/Materials.java`, `.../physics/Element.java`, `.../physics/Conversions.java`
-- Test: `mod/src/test/java/dev/oasm/phapthuat/physics/MaterialsTest.java`
+- Test: `mod/src/test/java/phapthuat/physics/MaterialsTest.java`
 
 **Interfaces:**
 - Produces:
@@ -212,7 +212,7 @@ Luật `siphon` (spec 8.2):
 
 **Files:**
 - Create: `.../physics/ShapeMath.java`, `.../physics/Ballistics.java`, `.../physics/EnergySplit.java`
-- Create: `mod/src/main/java/dev/oasm/phapthuat/spell/SpellParam.java`, `.../spell/ParamParser.java` (Java thuần, không import Minecraft)
+- Create: `mod/src/main/java/phapthuat/spell/SpellParam.java`, `.../spell/ParamParser.java` (Java thuần, không import Minecraft)
 - Test: `.../physics/ShapeMathTest.java`, `.../physics/BallisticsTest.java`, `.../spell/ParamParserTest.java`
 
 **Interfaces:**
@@ -307,7 +307,7 @@ Luật `siphon` (spec 8.2):
 - Create: `.../thermal/ThermalStore.java` (SavedData theo từng thế giới), `.../thermal/EntityThermal.java`, `.../thermal/ThermalAttachments.java`, `.../thermal/ThermalTicker.java`
 - Create: `.../thermal/WorldTemps.java`, `.../thermal/MaterialLookup.java`, `.../physics/EntityMass.java` (Java thuần, bảng spec 7.3 theo id thực thể)
 - Modify: `.../item/MeterItem.java`
-- Create: `mod/src/main/java/dev/oasm/phapthuat/gametest/ThermalGameTests.java`, `.../gametest/ModGameTests.java`
+- Create: `mod/src/main/java/phapthuat/gametest/ThermalGameTests.java`, `.../gametest/ModGameTests.java`
 - Test: `.../thermal/ThermalTableTest.java`, `.../physics/EntityMassTest.java`
 
 **Interfaces:**
