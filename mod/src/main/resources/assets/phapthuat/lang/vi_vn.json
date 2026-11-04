@@ -75,6 +75,7 @@
   "phapthuat.param.power": "Công suất",
   "phapthuat.param.fuel": "Nhiên liệu",
   "phapthuat.param.count": "Số lượng",
+  "phapthuat.param.lift_height": "Độ cao",
 
   "phapthuat.spell.tu_truong.name": "Từ Trường",
   "phapthuat.magnet.done": "%s: %s T, bán kính %s m — năng lượng trường %s mana, giữ %s giây",
@@ -106,6 +107,11 @@
   "phapthuat.dose.poison": "nhiễm độc",
   "phapthuat.dose.wither": "khô héo",
   "phapthuat.dose.severe": "nguy kịch",
+
+  "phapthuat.spell.nang.name": "Nâng",
+  "phapthuat.lift.done": "%s: lên %s m — %s",
+  "phapthuat.lift.unit": "%s (%s kg) lên %s m",
+  "phapthuat.lift.nothing": "%s: không có gì nâng được",
 
   "phapthuat.heat.single": "%s: %s",
   "phapthuat.heat.multi": "%s (%s đơn vị, mỗi đơn vị %s mana): %s",
@@ -258,5 +264,6 @@
   "phapthuat.material.fire": "Lửa",
   "phapthuat.material.campfire": "Lửa trại",
   "phapthuat.material.air": "Không khí",
-  "phapthuat.material.living_core": "Lõi sinh vật"
+  "phapthuat.material.living_core": "Lõi sinh vật",
+  "phapthuat.material.default_solid": "Khối khác (mặc định)"
 }

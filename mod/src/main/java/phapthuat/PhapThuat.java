@@ -22,6 +22,7 @@ import phapthuat.spell.impl.ArcSpell;
 import phapthuat.spell.impl.FuelSpell;
 import phapthuat.spell.impl.HeatSpell;
 import phapthuat.spell.impl.ImpulseSpell;
+import phapthuat.spell.impl.LiftSpell;
 import phapthuat.spell.impl.LightSpell;
 import phapthuat.spell.impl.MagnetSpell;
 import phapthuat.spell.impl.RadiationSpell;
@@ -57,5 +58,6 @@ public class PhapThuat {
         SpellRegistry.register(new LightSpell());
         SpellRegistry.register(new FuelSpell());
         SpellRegistry.register(new RadiationSpell());
+        SpellRegistry.register(new LiftSpell());
     }
 }

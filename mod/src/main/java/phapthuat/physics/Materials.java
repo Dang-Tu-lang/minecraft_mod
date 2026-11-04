@@ -33,9 +33,12 @@ public final class Materials {
             .build();
     public static final Material LIVING_CORE = Material.builder("living_core").thermal(1000, 3500).ignites(400)
             .estimated().build();
+    /** Khối không có trong bảng khi Nâng tính khối lượng cả khối: ρ 1500 kg/m³ (ước lượng game, spec 8.9). */
+    public static final Material DEFAULT_SOLID = Material.builder("default_solid").thermal(1500, 800).estimated()
+            .build();
 
     private static final List<Material> ALL = List.of(WOOD, WOOL, LEAVES, HAY, COAL_BLOCK, WAX, TNT, WATER, ICE, SNOW,
-            SAND, STONE, GLASS, OBSIDIAN, LAVA, MAGMA, FIRE, CAMPFIRE, AIR, LIVING_CORE);
+            SAND, STONE, GLASS, OBSIDIAN, LAVA, MAGMA, FIRE, CAMPFIRE, AIR, LIVING_CORE, DEFAULT_SOLID);
 
     private Materials() {}
 
