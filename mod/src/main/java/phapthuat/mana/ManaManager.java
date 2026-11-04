@@ -41,6 +41,15 @@ public final class ManaManager {
         store(player, new ManaPool(Config.MAX_MANA.get(), mana));
     }
 
+    /**
+     * Nạp mana cho GameTest, vượt trần {@link Config#MAX_MANA}: vài phép (Từ Trường bán kính 4) tốn hàng chục triệu
+     * mana nên người chơi giả 1000 mana không thi triển nổi. Sau khi nạp, trần của quỹ là chính lượng đã nạp, nên
+     * phép trừ đúng như lúc chơi thật. Chỉ dùng trong gametest.
+     */
+    public static void grantForTest(ServerPlayer player, double mana) {
+        store(player, new ManaPool(mana, mana));
+    }
+
     private static ManaPool pool(Player player) {
         return new ManaPool(Config.MAX_MANA.get(), get(player));
     }

@@ -84,7 +84,7 @@ public final class FuelSpell implements Spell {
         }
         double energyJ = 0;
         for (ItemStack stack : fuel) energyJ += CombustionCalc.itemEnergyJ(FuelChoices.burnTicks(stack));
-        BlockPos centerCell = BlockPos.containing(ctx.center());
+        BlockPos centerCell = ctx.airCell();
         int cells = countAir(ctx.level(), centerCell);
         CombustionCalc.Combustion burn = CombustionCalc.burn(energyJ, cells);
         CastReport heat = HeatSpell.applyHeat(ctx, units, burn.releasedJ(), displayName());

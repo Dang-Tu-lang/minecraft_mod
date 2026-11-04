@@ -46,26 +46,10 @@ public final class ThermalTicker {
             severe = true;
             entity.hurt(entity.damageSources().generic(), entity.getMaxHealth() / 2);
         }
-        applyDose(entity, tier);
+        RadiationTicker.applyDose(entity, tier);
         applyCold(entity, SiphonCalc.coldTier(natural - now.coreTempC()));
         entity.setData(ThermalAttachments.ENTITY_THERMAL,
                 new EntityThermal(now.coreTempC(), now.doseGy(), now.updatedAtTick(), severe));
-    }
-
-    /** Hiệu ứng theo bậc liều phóng xạ (spec 8.8): làm mới mỗi giây, tự tắt khi liều giảm khỏi bậc. */
-    private static void applyDose(LivingEntity entity, DoseTier tier) {
-        if (tier == DoseTier.NONE) return;
-        entity.addEffect(new MobEffectInstance(MobEffects.CONFUSION, 40, 0, false, false));
-        switch (tier) {
-            case NAUSEA -> entity.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, 40, 0, false, false));
-            case POISON -> {
-                entity.addEffect(new MobEffectInstance(MobEffects.POISON, 40, 0, false, false));
-                entity.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, 40, 0, false, false));
-                entity.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 40, 0, false, false));
-            }
-            case WITHER, SEVERE -> entity.addEffect(new MobEffectInstance(MobEffects.WITHER, 40, 0, false, false));
-            default -> {}
-        }
     }
 
     /** Lạnh theo bậc (spec 8.2): chậm chạp; đóng băng như tuyết bột + 1 máu/giây; mất 3 máu/giây. */

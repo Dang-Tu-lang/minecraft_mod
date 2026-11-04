@@ -90,12 +90,14 @@ public final class LiftSpell implements Spell {
         };
     }
 
-    /** Khối nâng được: rắn, cứng ≥ 0, không phải đá nền, không có block entity (rương, lò, ...). */
+    /** Khối nâng được: rắn, cứng ≥ 0, không phải đá nền, không có block entity (rương, lò, ...), không phải chất lỏng. */
     private static boolean liftable(ServerLevel level, BlockPos pos) {
         BlockState state = level.getBlockState(pos);
         if (state.isAir()) return false;
+        if (!state.getFluidState().isEmpty()) return false;
         if (state.is(Blocks.BEDROCK)) return false;
         if (state.getDestroySpeed(level, pos) < 0) return false;
+        if (!state.isCollisionShapeFullBlock(level, pos)) return false;
         BlockEntity be = level.getBlockEntity(pos);
         return be == null;
     }
@@ -139,7 +141,10 @@ public final class LiftSpell implements Spell {
                 Fmt.num(totalMana, 1)));
     }
 
-    /** Sinh vật: tắt trọng lực, đưa lên đều trong 1 giây, giữ tới hết thời gian rồi thả (rơi theo vanilla). */
+    /**
+     * Sinh vật: tắt trọng lực, đưa lên đều trong 1 giây, giữ tới hết thời gian rồi thả (rơi theo vanilla). Mỗi bước chỉ
+     * dịch chuyển nếu đường đi không vướng khối, nên trần nhà chặn lại chứ không xuyên qua.
+     */
     private static void liftEntity(ServerLevel level, LivingEntity living, double height, int holdTicks) {
         living.setNoGravity(true);
         double startY = living.getY();
@@ -147,19 +152,30 @@ public final class LiftSpell implements Spell {
         int riseTicks = (int) Math.max(1, RISE_SECONDS * TICKS_PER_SECOND);
         TimedEffects.add(level, (lvl, age) -> {
             if (!living.isAlive()) return false;
+            double wantY;
             if (age <= riseTicks) {
-                double t = (double) age / riseTicks;
-                living.teleportTo(living.getX(), startY + height * t, living.getZ());
+                wantY = startY + height * ((double) age / riseTicks);
             } else if (age <= riseTicks + holdTicks) {
-                living.teleportTo(living.getX(), targetY, living.getZ());
+                wantY = targetY;
             } else {
                 living.setNoGravity(false);
                 return false;
             }
+            moveUpBlocked(level, living, wantY);
             living.setDeltaMovement(Vec3.ZERO);
             living.hurtMarked = true;
             return true;
         });
+    }
+
+    /** Dịch lên tới {@code wantY} nếu không vướng khối; vướng thì đứng yên tại chỗ đang ở. */
+    private static void moveUpBlocked(ServerLevel level, Entity entity, double wantY) {
+        if (wantY <= entity.getY()) return;
+        AABB box = entity.getBoundingBox();
+        AABB target = box.move(0, wantY - entity.getY(), 0);
+        if (level.noCollision(entity, target)) {
+            entity.teleportTo(entity.getX(), wantY, entity.getZ());
+        }
     }
 
     /**
@@ -179,15 +195,16 @@ public final class LiftSpell implements Spell {
         int riseTicks = (int) Math.max(1, RISE_SECONDS * TICKS_PER_SECOND);
         TimedEffects.add(level, (lvl, age) -> {
             if (!falling.isAlive()) return false;
+            double wantY;
             if (age <= riseTicks) {
-                double t = (double) age / riseTicks;
-                falling.teleportTo(falling.getX(), startY + height * t, falling.getZ());
+                wantY = startY + height * ((double) age / riseTicks);
             } else if (age <= riseTicks + holdTicks) {
-                falling.teleportTo(falling.getX(), startY + height, falling.getZ());
+                wantY = startY + height;
             } else {
                 falling.setNoGravity(false);
                 return false;
             }
+            moveUpBlocked(level, falling, wantY);
             falling.setDeltaMovement(Vec3.ZERO);
             return true;
         });

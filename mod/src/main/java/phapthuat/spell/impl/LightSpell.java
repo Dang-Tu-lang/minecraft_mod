@@ -116,7 +116,7 @@ public final class LightSpell implements Spell {
             Component lamp) {
         ServerLevel level = ctx.level();
         Vec3 center = ctx.center();
-        BlockPos cell = BlockPos.containing(center);
+        BlockPos cell = ctx.airCell();
         boolean lit = visible && OpticsCalc.lightLevel(lumens) > 0 && level.getBlockState(cell).isAir();
         if (lit) {
             level.setBlock(cell, Blocks.LIGHT.defaultBlockState().setValue(

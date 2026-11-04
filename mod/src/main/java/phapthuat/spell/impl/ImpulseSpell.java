@@ -24,6 +24,7 @@ import phapthuat.physics.Element;
 import phapthuat.physics.EnergySplit;
 import phapthuat.physics.EntityMass;
 import phapthuat.physics.ImpulseCalc;
+import phapthuat.physics.PhysicsConstants;
 import phapthuat.spell.CastContext;
 import phapthuat.spell.CastReport;
 import phapthuat.spell.Fmt;
@@ -138,7 +139,7 @@ public final class ImpulseSpell implements Spell {
             return Component.translatable("phapthuat.impulse.single", displayName(), details.getFirst());
         }
         return Component.translatable("phapthuat.impulse.multi", displayName(), n,
-                Fmt.mana(perUnitJ / ctx.joulesPerMana()), Fmt.num(min, 1), Fmt.num(max, 1));
+                Fmt.mana(perUnitJ / ctx.joulesPerMana()), n, Fmt.num(min, 1), Fmt.num(max, 1));
     }
 
     /** Khối lượng của thực thể: bảng khối lượng sinh vật, còn lại 100 kg/m³ thể tích hitbox (spec 7.3). */
@@ -179,8 +180,11 @@ public final class ImpulseSpell implements Spell {
         } else {
             dir = look.normalize().scale(-1);
         }
-        player.push(dir.x * recoil / TICKS_PER_SECOND, dir.y * recoil / TICKS_PER_SECOND,
-                dir.z * recoil / TICKS_PER_SECOND);
+        // Cộng thêm vào vận tốc đang có rồi kẹp lại: nhiều lần thi triển liên tiếp khi đang rơi không được vượt 40 m/s.
+        Vec3 wanted = player.getDeltaMovement().add(dir.x * recoil / TICKS_PER_SECOND,
+                dir.y * recoil / TICKS_PER_SECOND, dir.z * recoil / TICKS_PER_SECOND);
+        double cap = PhysicsConstants.MAX_SPELL_SPEED / TICKS_PER_SECOND;
+        player.setDeltaMovement(wanted.length() > cap ? wanted.normalize().scale(cap) : wanted);
         player.hurtMarked = true;
     }
 

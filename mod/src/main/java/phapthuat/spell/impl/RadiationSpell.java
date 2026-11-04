@@ -14,6 +14,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
@@ -32,6 +33,7 @@ import phapthuat.spell.Spell;
 import phapthuat.spell.SpellParam;
 import phapthuat.spell.SpellUnit;
 import phapthuat.thermal.EntityThermal;
+import phapthuat.thermal.RadiationTicker;
 import phapthuat.thermal.WorldTemps;
 
 /**
@@ -111,10 +113,20 @@ public final class RadiationSpell implements Spell {
                 Component.literal(String.join("; ", lines.stream().map(Component::getString).toList()))));
     }
 
-    /** Cộng dồn liều vào trạng thái đã lưu của sinh vật (spec 6.8). */
+    /**
+     * Cộng dồn liều và áp bậc ngay lúc thi triển (CLAUDE.md đã chốt: hiệu ứng áp lúc thi triển, khi liều vừa vượt
+     * ngưỡng). Nếu để {@code ThermalTicker} lo, liều đã kịp giảm trong giây chờ nên 6 Gy tụt còn 5,93 Gy và bậc bị hụt.
+     */
     private static void addDose(LivingEntity living, double gy) {
         EntityThermal now = WorldTemps.currentEntity(living);
-        WorldTemps.saveEntity(living, now.coreTempC(), now.doseGy() + gy);
+        double total = now.doseGy() + gy;
+        boolean severe = now.severeApplied();
+        if (RadiationCalc.tier(total) == DoseTier.SEVERE && !severe) {
+            severe = true;
+            living.hurt(living.damageSources().generic(), living.getMaxHealth() / 2);
+        }
+        WorldTemps.saveEntity(living, now.coreTempC(), total, severe);
+        RadiationTicker.applyDose(living, RadiationCalc.tier(total));
     }
 
     /** Tán xạ: sinh vật khác trong 3 khối quanh điểm tác động (kể cả người chơi) nhận 5% năng lượng hấp thụ. */
@@ -130,8 +142,9 @@ public final class RadiationSpell implements Spell {
 
     /** Số khối rắn và số khối nước trên đoạn thẳng mắt → mục tiêu (spec 8.8). */
     private static double[] shield(ServerLevel level, Vec3 eye, Vec3 target) {
+        // Không truyền entity: CollisionContext.of(null) ném NPE trong 1.21.1 — dùng ngữ cảnh rỗng.
         BlockHitResult hit = level.clip(new ClipContext(eye, target, ClipContext.Block.COLLIDER,
-                ClipContext.Fluid.NONE, (net.minecraft.world.entity.Entity) null));
+                ClipContext.Fluid.NONE, CollisionContext.empty()));
         Vec3 stop = hit.getType() == HitResult.Type.MISS ? target : hit.getLocation();
         double solid = 0;
         double water = 0;
