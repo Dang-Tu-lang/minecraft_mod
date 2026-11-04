@@ -44,6 +44,7 @@ public final class GrimoireScreen extends Screen {
     private static final int MARGIN = 8;
     private static final int LIST_WIDTH = 120;
     private static final int ENTRY_HEIGHT = 14;
+    private static final int HEADER_HEIGHT = 13;
     private static final int LINE_HEIGHT = 10;
     private static final int PARAM_WIDTH = 120;
     private static final int SHAPE_WIDTH = 48;
@@ -68,9 +69,15 @@ public final class GrimoireScreen extends Screen {
     // Dựng lại trong init().
     private record Label(Component text, int x, int y, int color) {}
 
+    /** Một dòng của mục lục: tiêu đề nhóm nguyên tố, hoặc một phép / trang chung bấm được. */
+    private record Entry(String key, Component text, int y) {}
+
     private final List<Label> labels = new ArrayList<>();
     private final Map<SpellParam, EditBox> inputs = new LinkedHashMap<>();
     private final List<SpellParam> choiceParams = new ArrayList<>();
+    private final List<Entry> listEntries = new ArrayList<>();
+    private int listHeight;
+    private int listScroll;
     private List<FormattedCharSequence> lines = List.of();
     private int pageX;
     private int pageY;
@@ -97,26 +104,13 @@ public final class GrimoireScreen extends Screen {
         choiceParams.clear();
         inscribeButton = null;
 
-        int y = MARGIN;
-        y = entry(INTRO, Component.translatable("phapthuat.book.intro.title"), y);
-        y = entry(DATA, Component.translatable("phapthuat.book.data.title"), y);
-        List<Spell> spells = new ArrayList<>(SpellRegistry.all());
-        spells.sort(Comparator.comparing(Spell::element));
-        Element group = null;
-        for (Spell s : spells) {
-            if (s.element() != group) {
-                group = s.element();
-                y += 3;
-                labels.add(new Label(Component.translatable(group.langKey()), MARGIN, y, LABEL_COLOR));
-                y += LINE_HEIGHT;
-            }
-            y = entry(s.id(), s.displayName(), y);
-        }
-
         pageX = MARGIN * 2 + LIST_WIDTH;
         pageY = MARGIN;
         pageRight = width - MARGIN;
         pageBottom = height - MARGIN;
+
+        buildList();
+
         Spell spell = SpellRegistry.get(selected).orElse(null);
         if (spell != null && offhandWand() != null) pageBottom = buildInscribe(spell);
 
@@ -128,11 +122,55 @@ public final class GrimoireScreen extends Screen {
         scroll = Mth.clamp(scroll, 0, maxScroll());
     }
 
-    private int entry(String key, Component title, int y) {
-        Button b = addRenderableWidget(Button.builder(title, btn -> select(key))
-                .bounds(MARGIN, y, LIST_WIDTH, ENTRY_HEIGHT).build());
-        b.active = !key.equals(selected);
-        return y + ENTRY_HEIGHT + 2;
+    /**
+     * Cột trái: hai trang chung rồi các phép nhóm theo nguyên tố. 9 phép + 7 nhóm cao hơn màn hình, nên cột này cuộn
+     * được bằng lăn chuột; chỉ dòng nằm trọn trong khung mới được vẽ và bấm.
+     */
+    private void buildList() {
+        listEntries.clear();
+        int y = MARGIN;
+        listEntries.add(new Entry(INTRO, Component.translatable("phapthuat.book.intro.title"), y));
+        y += ENTRY_HEIGHT + 2;
+        listEntries.add(new Entry(DATA, Component.translatable("phapthuat.book.data.title"), y));
+        y += ENTRY_HEIGHT + 2;
+        List<Spell> spells = new ArrayList<>(SpellRegistry.all());
+        spells.sort(Comparator.comparing(Spell::element));
+        Element group = null;
+        for (Spell s : spells) {
+            if (s.element() != group) {
+                group = s.element();
+                y += 3;
+                listEntries.add(new Entry(null, Component.translatable(group.langKey()), y));
+                y += HEADER_HEIGHT;
+            }
+            listEntries.add(new Entry(s.id(), s.displayName(), y));
+            y += ENTRY_HEIGHT + 2;
+        }
+        listHeight = y - MARGIN;
+        listScroll = Mth.clamp(listScroll, 0, maxListScroll());
+
+        int top = MARGIN;
+        int bottom = listBottom();
+        for (Entry e : listEntries) {
+            int sy = e.y() - listScroll;
+            if (sy < top || sy + ENTRY_HEIGHT > bottom) continue;
+            if (e.key() == null) {
+                labels.add(new Label(e.text(), MARGIN, sy, LABEL_COLOR));
+            } else {
+                Button b = addRenderableWidget(Button.builder(e.text(), btn -> select(e.key()))
+                        .bounds(MARGIN, sy, LIST_WIDTH, ENTRY_HEIGHT).build());
+                b.active = !e.key().equals(selected);
+            }
+        }
+    }
+
+    /** Đáy thật của cột mục lục: đủ chỗ thì dừng ngay dưới dòng cuối, tràn thì dừng ở mép dưới màn hình. */
+    private int listBottom() {
+        return MARGIN + Math.min(listHeight, height - 2 * MARGIN);
+    }
+
+    private int maxListScroll() {
+        return Math.max(0, listHeight - (height - 2 * MARGIN));
     }
 
     private void select(String key) {
@@ -268,6 +306,13 @@ public final class GrimoireScreen extends Screen {
             g.fill(pageRight + 1, thumbY, pageRight + 3, thumbY + thumb, 0xFF808080);
         }
         for (Label l : labels) g.drawString(font, l.text(), l.x(), l.y(), l.color(), false);
+        if (maxListScroll() > 0) {
+            // Vạch cuộn của mục lục để biết còn phép phía dưới.
+            int track = listBottom() - MARGIN;
+            int thumb = Math.max(10, track * track / Math.max(1, listHeight));
+            int thumbY = MARGIN + (track - thumb) * listScroll / maxListScroll();
+            g.fill(MARGIN + LIST_WIDTH + 2, thumbY, MARGIN + LIST_WIDTH + 4, thumbY + thumb, 0xFF808080);
+        }
         for (Map.Entry<SpellParam, EditBox> e : inputs.entrySet()) {
             EditBox box = e.getValue();
             if (!valid(e.getKey(), box.getValue())) {
@@ -282,7 +327,13 @@ public final class GrimoireScreen extends Screen {
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
-        if (mouseX >= pageX && mouseX <= pageRight && mouseY >= pageY && mouseY <= pageBottom && scrollY != 0) {
+        if (scrollY == 0) return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
+        if (mouseX >= MARGIN && mouseX <= MARGIN + LIST_WIDTH && maxListScroll() > 0) {
+            listScroll = Mth.clamp(listScroll - (int) Math.signum(scrollY) * 3, 0, maxListScroll());
+            rebuildWidgets();
+            return true;
+        }
+        if (mouseX >= pageX && mouseX <= pageRight && mouseY >= pageY && mouseY <= pageBottom) {
             scroll = Mth.clamp(scroll - (int) Math.signum(scrollY) * 3, 0, maxScroll());
             return true;
         }
