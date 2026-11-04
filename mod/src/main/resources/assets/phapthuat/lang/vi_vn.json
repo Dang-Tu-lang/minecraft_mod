@@ -53,6 +53,17 @@
 
   "phapthuat.spell.gia_nhiet.name": "Gia Nhiệt",
 
+  "phapthuat.unit.kv": "kV",
+  "phapthuat.param.voltage": "Hiệu điện thế",
+  "phapthuat.spell.ho_quang.name": "Hồ Quang",
+  "phapthuat.arc.fizzle": "%s: E = %s MV/m < %s MV/m — chỉ lách tách, mana vẫn mất",
+  "phapthuat.arc.backfire": "%s: E = %s MV/m < %s MV/m — điện phóng ngược vào bạn, %s máu!",
+  "phapthuat.arc.hit": "%s: E = %s MV/m ≥ %s MV/m — trúng %s, %s sát thương",
+  "phapthuat.arc.hit_block": "%s: E = %s MV/m ≥ %s MV/m — phóng vào %s",
+  "phapthuat.arc.air": "%s: E = %s MV/m ≥ %s MV/m — tia phóng vào khoảng không",
+  "phapthuat.arc.water": "%s: E = %s MV/m ≥ %s MV/m — điện lan trong nước, %s sinh vật mỗi con %s máu",
+  "phapthuat.arc.water_none": "%s: E = %s MV/m ≥ %s MV/m — nhưng không có sinh vật nào trong nước quanh đó",
+
   "phapthuat.heat.single": "%s: %s",
   "phapthuat.heat.multi": "%s (%s đơn vị, mỗi đơn vị %s mana): %s",
   "phapthuat.heat.nothing": "%s: không có gì chịu tác động — mất %s mana",
