@@ -66,11 +66,21 @@
 
   "phapthuat.unit.tesla": "T",
   "phapthuat.unit.s": "giây",
+  "phapthuat.unit.nm": "nm",
+  "phapthuat.unit.watt": "W",
   "phapthuat.param.field": "Cảm ứng từ",
   "phapthuat.param.duration": "Thời gian",
+  "phapthuat.param.wavelength": "Bước sóng",
+  "phapthuat.param.power": "Công suất",
 
   "phapthuat.spell.tu_truong.name": "Từ Trường",
   "phapthuat.magnet.done": "%s: %s T, bán kính %s m — năng lượng trường %s mana, giữ %s giây",
+
+  "phapthuat.spell.phat_quang.name": "Phát Quang",
+  "phapthuat.light.done": "%s: %s nm, %s W → %s, %s lm, mức sáng %s",
+  "phapthuat.light.visible": "ánh sáng nhìn thấy",
+  "phapthuat.light.uv": "tia cực tím — không nhìn thấy được",
+  "phapthuat.light.infrared": "hồng ngoại — không nhìn thấy được",
 
   "phapthuat.heat.single": "%s: %s",
   "phapthuat.heat.multi": "%s (%s đơn vị, mỗi đơn vị %s mana): %s",
