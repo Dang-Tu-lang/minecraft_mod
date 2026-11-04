@@ -64,6 +64,14 @@
   "phapthuat.arc.water": "%s: E = %s MV/m ≥ %s MV/m — điện lan trong nước, %s sinh vật mỗi con %s máu",
   "phapthuat.arc.water_none": "%s: E = %s MV/m ≥ %s MV/m — nhưng không có sinh vật nào trong nước quanh đó",
 
+  "phapthuat.unit.tesla": "T",
+  "phapthuat.unit.s": "giây",
+  "phapthuat.param.field": "Cảm ứng từ",
+  "phapthuat.param.duration": "Thời gian",
+
+  "phapthuat.spell.tu_truong.name": "Từ Trường",
+  "phapthuat.magnet.done": "%s: %s T, bán kính %s m — năng lượng trường %s mana, giữ %s giây",
+
   "phapthuat.heat.single": "%s: %s",
   "phapthuat.heat.multi": "%s (%s đơn vị, mỗi đơn vị %s mana): %s",
   "phapthuat.heat.nothing": "%s: không có gì chịu tác động — mất %s mana",

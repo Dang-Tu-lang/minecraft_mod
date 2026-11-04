@@ -36,6 +36,9 @@ public class Config {
     public static final ModConfigSpec.IntValue MAX_TRACKED_BLOCKS = BUILDER
             .comment("Số khối tối đa được lưu nhiệt độ trong mỗi thế giới.")
             .defineInRange("maxTrackedBlocks", 10_000, 100, 1_000_000);
+    public static final ModConfigSpec.DoubleValue MAGNET_K = BUILDER
+            .comment("Hệ số hút của Từ Trường: gia tốc a = k·B²·(m_sắt/m), m/s². Chỉnh khi thử.")
+            .defineInRange("magnetK", 0.4, 0.0, 1e4);
 
     static final ModConfigSpec SPEC = BUILDER.build();
 

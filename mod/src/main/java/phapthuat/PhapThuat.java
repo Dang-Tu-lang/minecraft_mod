@@ -21,6 +21,7 @@ import phapthuat.spell.TimedEffects;
 import phapthuat.spell.impl.ArcSpell;
 import phapthuat.spell.impl.HeatSpell;
 import phapthuat.spell.impl.ImpulseSpell;
+import phapthuat.spell.impl.MagnetSpell;
 import phapthuat.spell.impl.SiphonSpell;
 import phapthuat.thermal.ThermalAttachments;
 import phapthuat.thermal.ThermalTicker;
@@ -49,5 +50,6 @@ public class PhapThuat {
         SpellRegistry.register(new SiphonSpell());
         SpellRegistry.register(new ImpulseSpell());
         SpellRegistry.register(new ArcSpell());
+        SpellRegistry.register(new MagnetSpell());
     }
 }
