@@ -97,6 +97,16 @@
   "phapthuat.fuel.done": "%s: %s %s = %s MJ; oxy đủ",
   "phapthuat.fuel.co": "%s: %s %s = %s MJ; chỉ đủ oxy cho %s%% (%s kg O₂) — sinh khí CO!",
 
+  "phapthuat.spell.buc_xa_neutron.name": "Bức Xạ Neutron",
+  "phapthuat.radiation.done": "%s: %s",
+  "phapthuat.radiation.unit": "%s (%s kg) nhận %s Gy (tổng %s Gy, %s)",
+  "phapthuat.radiation.nothing": "%s: không có sinh vật nào để chiếu",
+  "phapthuat.dose.none": "dưới ngưỡng",
+  "phapthuat.dose.nausea": "buồn nôn",
+  "phapthuat.dose.poison": "nhiễm độc",
+  "phapthuat.dose.wither": "khô héo",
+  "phapthuat.dose.severe": "nguy kịch",
+
   "phapthuat.heat.single": "%s: %s",
   "phapthuat.heat.multi": "%s (%s đơn vị, mỗi đơn vị %s mana): %s",
   "phapthuat.heat.nothing": "%s: không có gì chịu tác động — mất %s mana",

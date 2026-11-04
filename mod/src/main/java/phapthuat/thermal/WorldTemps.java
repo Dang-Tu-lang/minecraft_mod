@@ -75,12 +75,20 @@ public final class WorldTemps {
         double natural = naturalEntityC(entity);
         if (!entity.hasData(ThermalAttachments.ENTITY_THERMAL)) return new EntityThermal(natural, 0, now);
         EntityThermal saved = entity.getData(ThermalAttachments.ENTITY_THERMAL);
-        if (Double.isNaN(saved.coreTempC())) saved = new EntityThermal(natural, saved.doseGy(), saved.updatedAtTick());
+        if (Double.isNaN(saved.coreTempC())) {
+            saved = new EntityThermal(natural, saved.doseGy(), saved.updatedAtTick(), saved.severeApplied());
+        }
         return saved.decayedTo(now, natural, Config.HALF_LIFE_SECONDS.get(), Config.DOSE_HALF_LIFE_SECONDS.get());
     }
 
     public static void saveEntity(LivingEntity entity, double coreTempC, double doseGy) {
+        boolean severe = entity.hasData(ThermalAttachments.ENTITY_THERMAL)
+                && entity.getData(ThermalAttachments.ENTITY_THERMAL).severeApplied();
+        saveEntity(entity, coreTempC, doseGy, severe);
+    }
+
+    public static void saveEntity(LivingEntity entity, double coreTempC, double doseGy, boolean severeApplied) {
         entity.setData(ThermalAttachments.ENTITY_THERMAL,
-                new EntityThermal(coreTempC, doseGy, entity.level().getGameTime()));
+                new EntityThermal(coreTempC, doseGy, entity.level().getGameTime(), severeApplied));
     }
 }

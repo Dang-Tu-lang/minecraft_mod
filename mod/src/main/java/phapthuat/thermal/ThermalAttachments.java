@@ -17,7 +17,9 @@ public final class ThermalAttachments {
     public static final Codec<EntityThermal> CODEC = RecordCodecBuilder.create(i -> i.group(
             Codec.DOUBLE.fieldOf("core").forGetter(EntityThermal::coreTempC),
             Codec.DOUBLE.fieldOf("dose").forGetter(EntityThermal::doseGy),
-            Codec.LONG.fieldOf("t").forGetter(EntityThermal::updatedAtTick)).apply(i, EntityThermal::new));
+            Codec.LONG.fieldOf("t").forGetter(EntityThermal::updatedAtTick),
+            Codec.BOOL.optionalFieldOf("severe", false).forGetter(EntityThermal::severeApplied))
+            .apply(i, EntityThermal::new));
 
     /** Lõi nhiệt và liều phóng xạ của sinh vật. Mặc định NaN = đang ở nhiệt độ tự nhiên. */
     public static final Supplier<AttachmentType<EntityThermal>> ENTITY_THERMAL = ATTACHMENT_TYPES.register(

@@ -24,6 +24,7 @@ import phapthuat.spell.impl.HeatSpell;
 import phapthuat.spell.impl.ImpulseSpell;
 import phapthuat.spell.impl.LightSpell;
 import phapthuat.spell.impl.MagnetSpell;
+import phapthuat.spell.impl.RadiationSpell;
 import phapthuat.spell.impl.SiphonSpell;
 import phapthuat.thermal.ThermalAttachments;
 import phapthuat.thermal.ThermalTicker;
@@ -55,5 +56,6 @@ public class PhapThuat {
         SpellRegistry.register(new MagnetSpell());
         SpellRegistry.register(new LightSpell());
         SpellRegistry.register(new FuelSpell());
+        SpellRegistry.register(new RadiationSpell());
     }
 }
