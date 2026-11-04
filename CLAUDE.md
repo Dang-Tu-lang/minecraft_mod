@@ -53,16 +53,14 @@ Mod Minecraft 1.21.1 / NeoForge 21.1.265 / Java 21: mỗi phép là một công 
 - `helper.placeAt` lấy vật phẩm từ **tay chính** của người chơi, không lấy từ stack truyền vào.
 - Biome của GameTest có T_mt = 20°C. Người chơi giả bắt đầu với 1000 mana.
 
-## Trạng thái hiện tại (2026-11-03)
+## Trạng thái hiện tại (2026-11-04)
 
-- Nhánh `phep-nen-tang`. Kế hoạch 1 đã xong và qua review độc lập (lúc đó 57 unit test và 36 GameTest đều xanh).
-- **Kế hoạch 2: Task 1–3 đã commit**: khung mở rộng, lõi vật lý Động, Hấp dẫn, Điện từ, Quang, Hóa, Hạt nhân. **Test của kế hoạch 2 chưa chạy lần nào.** Chủ dự án muốn viết hết rồi test **một lần** ở cuối (Task 11); mỗi task chỉ chạy `compileJava compileTestJava`.
-- **Làm tiếp từ Task 4 (Xung Lực)**, rồi tới Task 11. Sổ theo dõi nằm ở máy (git bỏ qua): `.superpowers/sdd/2026-11-02-ke-hoach-2-bay-phep-con-lai/progress.md`. Đọc nó trước khi làm: task có dòng `complete` là đã xong, các dòng `Ruling:` là quyết định đã chốt.
-- Quyết định đã chốt trước cho các task còn lại:
-  - Nâng tính chi phí theo khối lượng mục tiêu qua `Spell.upfrontCostMana(spell, level, units)` (đã có sẵn).
-  - Liều ≥ 10 Gy: mất 50% máu áp **lúc thi triển**, khi liều vừa vượt ngưỡng.
-  - Thêm cuộn cho cột mục lục của sách ở Task 11 (9 phép sẽ tràn màn hình).
-- Sau kế hoạch 2: cùng chủ dự án thiết kế **phép kết hợp** từ các phép cơ bản. Bàn ý tưởng trước, chưa code ngay.
+- Nhánh `main`. Kế hoạch 1 đã xong và qua review độc lập (lúc đó 57 unit test và 36 GameTest đều xanh).
+- **Kế hoạch 2 đã xong toàn bộ Task 1–11**, mỗi task một commit (`09cd0eb`…`f71d9a4`): 7 phép mới Xung Lực, Hồ Quang, Từ Trường, Phát Quang, Đốt Nhiên Liệu, Bức Xạ Neutron, Nâng, kèm trang sách và hướng dẫn.
+- **Unit test 85/85 xanh; `build` ra `phapthuat-1.0.0.jar`.** GameTest của kế hoạch 2 **chưa từng chạy** (chủ dự án tự chạy `runGameTestServer` và `runClient`).
+- Sổ theo dõi nằm ở máy (git bỏ qua): `.superpowers/sdd/2026-11-02-ke-hoach-2-bay-phep-con-lai/progress.md` — các dòng `Ruling:` là quyết định đã chốt, đọc trước khi sửa tiếp.
+- Repository này đặt `git config --local` danh tính `dangyuuki` vì máy chưa có danh tính toàn cục.
+- Việc tiếp theo: cùng chủ dự án thiết kế **phép kết hợp** từ các phép cơ bản. Bàn ý tưởng trước, chưa code ngay.
 
 ## Công cụ
 
