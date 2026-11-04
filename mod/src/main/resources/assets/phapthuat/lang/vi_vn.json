@@ -40,6 +40,16 @@
   "phapthuat.param.height": "Cao",
   "phapthuat.param.speed": "Tốc độ phóng",
   "phapthuat.param.energy": "Năng lượng",
+  "phapthuat.param.direction": "Chiều",
+  "phapthuat.choice.push": "Đẩy",
+  "phapthuat.choice.pull": "Kéo",
+
+  "phapthuat.spell.xung_luc.name": "Xung Lực",
+  "phapthuat.impulse.single": "%s: %s",
+  "phapthuat.impulse.unit": "%s (%s kg) đạt %s m/s",
+  "phapthuat.impulse.multi": "%s (%s đơn vị, mỗi đơn vị %s mana): %s đạt %s–%s m/s",
+  "phapthuat.impulse.nothing": "%s: không có gì để đẩy",
+  "phapthuat.impulse.recoil": " — bạn bị giật lùi %s m/s",
 
   "phapthuat.spell.gia_nhiet.name": "Gia Nhiệt",
 
